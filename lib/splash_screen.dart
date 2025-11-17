@@ -46,11 +46,17 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         child: Center(
-          child: Image.asset(
-            'assets/logo/logo-light.png',
-            width: 200,
-            height: 200,
-            fit: BoxFit.contain,
+          child: ColorFiltered(
+            colorFilter: const ColorFilter.mode(
+              Color(0xFFFFFFFF), // #ffffff
+              BlendMode.srcIn,
+            ),
+            child: Image.asset(
+              'assets/logo/logo-light.png',
+              width: 400,
+              height: 400,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),
