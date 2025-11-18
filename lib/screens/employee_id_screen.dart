@@ -10,7 +10,8 @@ class EmployeeIdScreen extends StatefulWidget {
 class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
   final TextEditingController _businessNameController =
       TextEditingController(text: 'Nests India (nests)');
-  final TextEditingController _businessCodeController = TextEditingController();
+  final TextEditingController _businessCodeController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -24,23 +25,21 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
     final double topSpacing = MediaQuery.of(context).size.height * 0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor:  Colors.white,
       body: Stack(
         children: [
           const Positioned.fill(child: _EmployeeGradientBackground()),
           SafeArea(
-            child: SingleChildScrollView(
-             
-              child: Column(
-                children: [
-                  const _HeaderLogo(),
-                  SizedBox(height: topSpacing * 0.2),
-                  _DetailsCard(
+            child: Column(
+              children: [
+                SizedBox(height: topSpacing * 0.2),
+                Expanded(
+                  child: _DetailsCard(
                     businessNameController: _businessNameController,
                     businessCodeController: _businessCodeController,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -65,25 +64,6 @@ class _EmployeeGradientBackground extends StatelessWidget {
   }
 }
 
-class _HeaderLogo extends StatelessWidget {
-  const _HeaderLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Image.asset(
-          'assets/logo/logo-light.png',
-          width: 120,
-          fit: BoxFit.contain,
-          color: Colors.white,
-          colorBlendMode: BlendMode.srcIn,
-        ),
-      ],
-    );
-  }
-}
-
 class _DetailsCard extends StatelessWidget {
   final TextEditingController businessNameController;
   final TextEditingController businessCodeController;
@@ -97,8 +77,8 @@ class _DetailsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 0),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
+      margin: const EdgeInsets.only(top: 40),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -110,11 +90,20 @@ class _DetailsCard extends StatelessWidget {
           ),
         ],
       ),
+
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Image.asset(
+            'assets/logo/logo-light.png',
+            width: 110,
+            color: const Color(0xFF171A58),
+            colorBlendMode: BlendMode.srcIn,
+          ),
+          const SizedBox(height: 20),
           const _ScreenTitle(),
           const SizedBox(height: 24),
+
           const _FieldLabel(text: 'Business name'),
           const SizedBox(height: 8),
           _InputField(
@@ -123,18 +112,20 @@ class _DetailsCard extends StatelessWidget {
             prefixIcon: Icons.search,
           ),
           const SizedBox(height: 20),
+
           const _OrDivider(),
           const SizedBox(height: 20),
+
           const _FieldLabel(text: 'Business Code'),
           const SizedBox(height: 8),
           _InputField(
             controller: businessCodeController,
             hintText: 'Enter business code',
-            prefixIcon: null,
             suffixIcon: Icons.info_outline_rounded,
-            textInputType: TextInputType.text,
           ),
-          const SizedBox(height: 32),
+
+          const Spacer(),
+
           SizedBox(
             width: double.infinity,
             child: DecoratedBox(
@@ -172,29 +163,21 @@ class _ScreenTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: const [
-        Center(
-          child: Text(
-            'Enter Company Details',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF171A58),
-            ),
-            textAlign: TextAlign.center,
+        Text(
+          'Enter Company Details',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF171A58),
           ),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: 8),
-        Center(
-          child: Text(
-            'Add Your Workplace Info',
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF7D8CA1),
-            ),
-            textAlign: TextAlign.center,
-          ),
+        Text(
+          'Add Your Workplace Info',
+          style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -263,40 +246,35 @@ class _InputField extends StatelessWidget {
   final String hintText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
-  final TextInputType textInputType;
 
   const _InputField({
     required this.controller,
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
-    this.textInputType = TextInputType.text,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      keyboardType: textInputType,
       decoration: InputDecoration(
         hintText: hintText,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         filled: true,
         fillColor: Colors.white,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: const Color(0xFF7D8CA1)) : null,
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: const Color(0xFF7D8CA1)) : null,
+        prefixIcon:
+            prefixIcon != null ? Icon(prefixIcon, color: const Color(0xFF7D8CA1)) : null,
+        suffixIcon:
+            suffixIcon != null ? Icon(suffixIcon, color: const Color(0xFF7D8CA1)) : null,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
-          borderSide: const BorderSide(
-            color: Color(0xFFE2E8F0),
-          ),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
-          borderSide: const BorderSide(
-            color: Color(0xFF532C8C),
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: Color(0xFF532C8C), width: 1.5),
         ),
       ),
     );
@@ -315,10 +293,7 @@ class _OrDivider extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'Or',
-            style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF7D8CA1),
-            ),
+            style: TextStyle(fontSize: 12, color: Color(0xFF7D8CA1)),
           ),
         ),
         Expanded(child: Divider(color: Color(0xFFE2E8F0))),
@@ -326,4 +301,3 @@ class _OrDivider extends StatelessWidget {
     );
   }
 }
-
