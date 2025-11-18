@@ -190,7 +190,7 @@ class _OtpHeader extends StatelessWidget {
         children: [
           CustomPaint(
             size: Size(MediaQuery.of(context).size.width, headerHeight),
-            painter: _HeaderWavePainter(),
+            painter: _OtpWavePainter(),
           ),
           Center(
             child: Padding(
@@ -211,138 +211,139 @@ class _OtpHeader extends StatelessWidget {
   }
 }
 
-class _HeaderWavePainter extends CustomPainter {
+class _OtpWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    Path buildPath(double offsetFactor) {
-      final offset = size.height * offsetFactor;
-      final path = Path();
-      path.moveTo(size.width * 0.083, size.height * 0.76 + offset);
-      path.cubicTo(
-        size.width * 0.017,
-        size.height * 0.54 + offset,
-        size.width * -0.085,
-        size.height * 0.48 + offset,
-        size.width * -0.158,
-        size.height * 0.47 + offset,
-      );
-      path.cubicTo(
-        size.width * -0.188,
-        size.height * 0.47 + offset,
-        size.width * -0.202,
-        size.height * 0.47 + offset,
-        size.width * -0.209,
-        size.height * 0.45 + offset,
-      );
-      path.cubicTo(
-        size.width * -0.216,
-        size.height * 0.44 + offset,
-        size.width * -0.216,
-        size.height * 0.41 + offset,
-        size.width * -0.216,
-        size.height * 0.35 + offset,
-      );
-      path.lineTo(size.width * -0.216, size.height * 0.10 + offset);
-      path.cubicTo(
-        size.width * -0.216,
-        size.height * 0.05 + offset,
-        size.width * -0.216,
-        size.height * 0.02 + offset,
-        size.width * -0.209,
-        size.height * 0.01 + offset,
-      );
-      path.cubicTo(
-        size.width * -0.202,
-        offset,
-        size.width * -0.19,
-        offset,
-        size.width * -0.1679,
-        offset,
-      );
-      path.lineTo(size.width * 1.056, offset);
-      path.cubicTo(
-        size.width * 1.078,
-        offset,
-        size.width * 1.089,
-        offset,
-        size.width * 1.096,
-        size.height * 0.01 + offset,
-      );
-      path.cubicTo(
-        size.width * 1.104,
-        size.height * 0.02 + offset,
-        size.width * 1.104,
-        size.height * 0.05 + offset,
-        size.width * 1.104,
-        size.height * 0.10 + offset,
-      );
-      path.lineTo(size.width * 1.104, size.height * 0.50 + offset);
-      path.cubicTo(
-        size.width * 1.104,
-        size.height * 0.55 + offset,
-        size.width * 1.104,
-        size.height * 0.57 + offset,
-        size.width * 1.098,
-        size.height * 0.59 + offset,
-      );
-      path.cubicTo(
-        size.width * 1.092,
-        size.height * 0.61 + offset,
-        size.width * 1.081,
-        size.height * 0.61 + offset,
-        size.width * 1.061,
-        size.height * 0.61 + offset,
-      );
-      path.cubicTo(
-        size.width * 0.867,
-        size.height * 0.66 + offset,
-        size.width * 0.548,
-        size.height * 0.86 + offset,
-        size.width * 0.402,
-        size.height * 0.97 + offset,
-      );
-      path.cubicTo(
-        size.width * 0.332,
-        size.height * 1.02 + offset,
-        size.width * 0.168,
-        size.height * 1.04 + offset,
-        size.width * 0.083,
-        size.height * 0.76 + offset,
-      );
-      path.close();
-      return path;
-    }
+    final mainWavePath = _createBottomWave(size);
 
-    final farWavePaint = Paint()
+    final mainPaint = Paint()
       ..shader = const LinearGradient(
-        begin: Alignment.centerRight,
-        end: Alignment.centerLeft,
-        colors: [
-          Color.fromRGBO(95, 46, 151, 0.24),
-          Color.fromRGBO(0, 30, 64, 0.24),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    final middleWavePaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment.centerRight,
-        end: Alignment.centerLeft,
-        colors: [
-          Color.fromRGBO(95, 46, 151, 0.49),
-          Color.fromRGBO(0, 30, 64, 0.49),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    final primaryPaint = Paint()
-      ..shader = const LinearGradient(
-        begin: Alignment(1.8, -1.5),
-        end: Alignment(0.8, 2.5),
         colors: [Color(0xFF241E63), Color(0xFF482983)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+    canvas.drawPath(mainWavePath, mainPaint);
 
-    canvas.drawPath(buildPath(0.09), farWavePaint);
-    canvas.drawPath(buildPath(0.05), middleWavePaint);
-    canvas.drawPath(buildPath(0.0), primaryPaint);
+    final firstStrokePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color.fromRGBO(95, 46, 151, 0.49),
+          const Color.fromRGBO(0, 30, 64, 0.49),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 15
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    canvas.drawPath(mainWavePath, firstStrokePaint);
+
+    final secondStrokePaint = Paint()
+      ..color = const Color(0xFFB8A8E0).withOpacity(0.5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 15
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    canvas.drawPath(mainWavePath, secondStrokePaint);
+  }
+
+  Path _createBottomWave(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 1.422, size.height * 0.7446);
+    path.cubicTo(
+      size.width * 1.532,
+      size.height * 0.491,
+      size.width * 1.713,
+      size.height * 0.437,
+      size.width * 1.825,
+      size.height * 0.443,
+    );
+    path.cubicTo(
+      size.width * 1.853,
+      size.height * 0.4445,
+      size.width * 1.867,
+      size.height * 0.4455,
+      size.width * 1.875,
+      size.height * 0.431,
+    );
+    path.cubicTo(
+      size.width * 1.883,
+      size.height * 0.4165,
+      size.width * 1.883,
+      size.height * 0.392,
+      size.width * 1.883,
+      size.height * 0.344,
+    );
+    path.lineTo(size.width * 1.883, size.height * 0.036);
+    path.cubicTo(
+      size.width * 1.883,
+      size.height * -0.056,
+      size.width * 1.883,
+      size.height * -0.104,
+      size.width * 1.876,
+      size.height * -0.128,
+    );
+    path.cubicTo(
+      size.width * 1.868,
+      size.height * -0.154,
+      size.width * 1.856,
+      size.height * -0.154,
+      size.width * 1.833,
+      size.height * -0.154,
+    );
+    path.lineTo(size.width * -0.098, size.height * -0.154);
+    path.cubicTo(
+      size.width * -0.121,
+      size.height * -0.154,
+      size.width * -0.132,
+      size.height * -0.154,
+      size.width * -0.14,
+      size.height * -0.128,
+    );
+    path.cubicTo(
+      size.width * -0.147,
+      size.height * -0.104,
+      size.width * -0.147,
+      size.height * -0.056,
+      size.width * -0.147,
+      size.height * 0.036,
+    );
+    path.lineTo(size.width * -0.147, size.height * 0.494);
+    path.cubicTo(
+      size.width * -0.147,
+      size.height * 0.535,
+      size.width * -0.147,
+      size.height * 0.554,
+      size.width * -0.14,
+      size.height * 0.571,
+    );
+    path.cubicTo(
+      size.width * -0.134,
+      size.height * 0.586,
+      size.width * -0.123,
+      size.height * 0.588,
+      size.width * -0.101,
+      size.height * 0.5895,
+    );
+    path.cubicTo(
+      size.width * 0.190,
+      size.height * 0.626,
+      size.width * 0.702,
+      size.height * 0.852,
+      size.width * 0.932,
+      size.height * 0.967,
+    );
+    path.cubicTo(
+      size.width * 1.041,
+      size.height * 1.018,
+      size.width * 1.289,
+      size.height * 1.045,
+      size.width * 1.422,
+      size.height * 0.7446,
+    );
+    path.close();
+    return path;
   }
 
   @override
