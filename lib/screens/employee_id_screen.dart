@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'verify_identity_screen.dart';
 
 class EmployeeIdScreen extends StatefulWidget {
   const EmployeeIdScreen({super.key});
@@ -67,8 +68,16 @@ class _EmployeeContentCard extends StatelessWidget {
   final TextEditingController businessNameController;
   final TextEditingController businessCodeController;
 
+  void _handleContinue(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const VerifyIdentityScreen(),
+      ),
+    );
+  }
+
   const _EmployeeContentCard({
-    super.key,
     required this.businessNameController,
     required this.businessCodeController,
   });
@@ -166,7 +175,9 @@ class _EmployeeContentCard extends StatelessWidget {
           const Spacer(),
 
           /// Continue Button
-          _ContinueButton(),
+          _ContinueButton(
+            onPressed: () => _handleContinue(context),
+          ),
         ],
       ),
     );
@@ -181,8 +192,8 @@ class _HeaderLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       'assets/logo/logo-light.png',
-      width: 120,
-      color: const Color(0xFF171A58),
+      width: 220,
+      
       colorBlendMode: BlendMode.srcIn,
     );
   }
@@ -195,7 +206,6 @@ class _CustomInputField extends StatelessWidget {
   final IconData icon;
 
   const _CustomInputField({
-    super.key,
     required this.controller,
     required this.hint,
     required this.icon,
@@ -222,6 +232,10 @@ class _CustomInputField extends StatelessWidget {
 
 /// ------------------- CONTINUE BUTTON --------------------------
 class _ContinueButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _ContinueButton({required this.onPressed});
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -236,7 +250,7 @@ class _ContinueButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: onPressed,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,

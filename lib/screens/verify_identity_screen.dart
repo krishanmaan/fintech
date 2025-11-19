@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'verify_identity_screen.dart';
+import 'aadhaar_verify_identity_screen.dart';
 
 class VerifyIdentityScreen extends StatefulWidget {
   const VerifyIdentityScreen({super.key});
@@ -253,7 +253,7 @@ class _VerifyNowButton extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const VerifyIdentityScreen(),
+                builder: (_) => const AadhaarVerifyIdentityScreen(),
               ),
             );
           },
