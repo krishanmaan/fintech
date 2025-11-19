@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'varify_statius_screen.dart';
 
+/// Final bank verification step in the KYC wizard.
 class BankVerifyIdentityScreen extends StatefulWidget {
   const BankVerifyIdentityScreen({super.key});
 
@@ -118,6 +119,7 @@ class _BankContentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 28),
+            /// Bank selector tile – static for now.
             const _BankProviderTile(),
             const SizedBox(height: 24),
             const _FieldLabel("Account Number"),
@@ -155,6 +157,7 @@ class _BankContentCard extends StatelessWidget {
               hint: "Add cvv number",
             ),
             const SizedBox(height: 32),
+            /// Submit and move to the verification status summary.
             const _VerifyButton(),
           ],
         ),
@@ -376,6 +379,21 @@ class _StepItem extends StatelessWidget {
     final Color activeColor = const Color(0xFF5B2B8F);
     final Color inactiveColor = Colors.grey.shade300;
 
+    Color backgroundColor;
+    Color textColor;
+
+    // Completed steps are filled; current step gets a lighter background cue.
+    if (isCurrent) {
+      backgroundColor = const Color(0xFFEDEBFF);
+      textColor = activeColor;
+    } else if (isCompleted) {
+      backgroundColor = activeColor;
+      textColor = Colors.white;
+    } else {
+      backgroundColor = Colors.white;
+      textColor = const Color(0xFF98A2B3);
+    }
+
     return Container(
       width: 36,
       height: 36,
@@ -385,15 +403,12 @@ class _StepItem extends StatelessWidget {
           color: isCompleted ? activeColor : inactiveColor,
           width: 2,
         ),
-        color: isCurrent ? const Color(0xFFEDEBFF) : Colors.white,
+        color: backgroundColor,
       ),
       alignment: Alignment.center,
       child: Text(
         label,
-        style: TextStyle(
-          color: isCompleted ? activeColor : const Color(0xFF98A2B3),
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
       ),
     );
   }

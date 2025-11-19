@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'pan_verify_identity_screen.dart';
 
+/// Aadhaar verification entry screen for the KYC funnel.
 class AadhaarVerifyIdentityScreen extends StatefulWidget {
   const AadhaarVerifyIdentityScreen({super.key});
 
@@ -106,6 +107,7 @@ class _AadhaarContentCard extends StatelessWidget {
 
           const SizedBox(height: 30),
 
+          /// Pre-selected verification provider tile.
           const _VerificationProviderTile(),
 
           const SizedBox(height: 30),
@@ -128,6 +130,7 @@ class _AadhaarContentCard extends StatelessWidget {
 
           const Spacer(),
 
+          /// Continue to the PAN verification step.
           const _VerifyButton(),
         ],
       ),
@@ -206,6 +209,21 @@ class _StepItem extends StatelessWidget {
     final Color activeColor = const Color(0xFF5B2B8F);
     final Color inactiveColor = Colors.grey.shade300;
 
+    Color backgroundColor;
+    Color textColor;
+
+    // Current step gets a soft fill while completed steps are fully colored.
+    if (isCurrent) {
+      backgroundColor = const Color(0xFFEDEBFF);
+      textColor = activeColor;
+    } else if (isCompleted) {
+      backgroundColor = activeColor;
+      textColor = Colors.white;
+    } else {
+      backgroundColor = Colors.white;
+      textColor = const Color(0xFF98A2B3);
+    }
+
     return Container(
       width: 40,
       height: 40,
@@ -215,15 +233,12 @@ class _StepItem extends StatelessWidget {
           color: isCompleted ? activeColor : inactiveColor,
           width: 2,
         ),
-        color: isCurrent ? const Color(0xFFEDEBFF) : Colors.white,
+        color: backgroundColor,
       ),
       alignment: Alignment.center,
       child: Text(
         label,
-        style: TextStyle(
-          color: isCompleted ? activeColor : const Color(0xFF98A2B3),
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
       ),
     );
   }

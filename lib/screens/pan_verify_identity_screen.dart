@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'bank_verify_identity_screen.dart';
 
+/// PAN verification screen – Step 2 of the KYC process.
 class PanVerifyIdentityScreen extends StatefulWidget {
   const PanVerifyIdentityScreen({super.key});
 
@@ -35,6 +36,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
               });
             }
 
+            // Build a static grid-based calendar that mimics the design spec.
             List<Widget> _buildCalendarDays() {
               final List<Widget> rows = [];
               const List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -342,6 +344,7 @@ class _PanContentCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
+          /// PAN verification provider selection.
           const _VerificationProviderTile(),
           const SizedBox(height: 24),
           const Text(
@@ -372,6 +375,7 @@ class _PanContentCard extends StatelessWidget {
             onTap: onPickDate,
           ),
           const Spacer(),
+          /// Proceed to the bank verification step.
           const _VerifyButton(),
         ],
       ),
@@ -582,6 +586,21 @@ class _StepItem extends StatelessWidget {
     final Color activeColor = const Color(0xFF5B2B8F);
     final Color inactiveColor = Colors.grey.shade300;
 
+    Color backgroundColor;
+    Color textColor;
+
+    // Keep current step highlighted softly while previous steps are solid purple.
+    if (isCurrent) {
+      backgroundColor = const Color(0xFFEDEBFF);
+      textColor = activeColor;
+    } else if (isCompleted) {
+      backgroundColor = activeColor;
+      textColor = Colors.white;
+    } else {
+      backgroundColor = Colors.white;
+      textColor = const Color(0xFF98A2B3);
+    }
+
     return Container(
       width: 36,
       height: 36,
@@ -591,15 +610,12 @@ class _StepItem extends StatelessWidget {
           color: isCompleted ? activeColor : inactiveColor,
           width: 2,
         ),
-        color: isCurrent ? const Color(0xFFEDEBFF) : Colors.white,
+        color: backgroundColor,
       ),
       alignment: Alignment.center,
       child: Text(
         label,
-        style: TextStyle(
-          color: isCompleted ? activeColor : const Color(0xFF98A2B3),
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
       ),
     );
   }

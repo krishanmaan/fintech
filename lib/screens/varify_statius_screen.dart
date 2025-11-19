@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Possible states for the KYC verification summary.
 enum KycStatus { completed, pending }
 
+/// Final status screen that shows whether KYC is pending or complete.
 class VarifyStatiusScreen extends StatelessWidget {
   final KycStatus status;
 
@@ -62,8 +64,10 @@ class VarifyStatiusScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 24),
+                        /// Top banner summarizing the overall result.
                         _StatusHighlightCard(theme: theme),
                         const SizedBox(height: 16),
+                        /// Individual checklist item states.
                         _StatusListCard(theme: theme),
                         const Spacer(),
                         _StatusFooter(status: status),
