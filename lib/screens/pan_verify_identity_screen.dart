@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'bank_verify_identity_screen.dart';
 
 class PanVerifyIdentityScreen extends StatefulWidget {
   const PanVerifyIdentityScreen({super.key});
@@ -525,7 +526,14 @@ class _VerifyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const BankVerifyIdentityScreen(),
+              ),
+            );
+          },
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,
@@ -548,21 +556,11 @@ class _StepHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: const [
-        _StepItem(
-          label: '1',
-          isCompleted: true,
-        ),
+        _StepItem(label: '1', isCompleted: true),
         _StepConnector(isCompleted: true),
-        _StepItem(
-          label: '2',
-          isCompleted: true,
-          isCurrent: true,
-        ),
+        _StepItem(label: '2', isCompleted: true, isCurrent: true),
         _StepConnector(isCompleted: false),
-        _StepItem(
-          label: '3',
-          isCompleted: false,
-        ),
+        _StepItem(label: '3', isCompleted: false),
       ],
     );
   }

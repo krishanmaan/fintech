@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'pan_verify_identity_screen.dart';
 
 class AadhaarVerifyIdentityScreen extends StatefulWidget {
   const AadhaarVerifyIdentityScreen({super.key});
@@ -178,9 +179,9 @@ class _StepHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: const [
-          _StepItem(label: '1', isCompleted: true),
-          _StepConnector(isCompleted: true),
-          _StepItem(label: '2', isCompleted: true, isCurrent: true),
+          _StepItem(label: '1', isCompleted: true, isCurrent: true),
+          _StepConnector(isCompleted: false),
+          _StepItem(label: '2', isCompleted: false),
           _StepConnector(isCompleted: false),
           _StepItem(label: '3', isCompleted: false),
         ],
@@ -269,7 +270,14 @@ class _VerifyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const PanVerifyIdentityScreen(),
+              ),
+            );
+          },
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,
