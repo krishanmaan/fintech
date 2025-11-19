@@ -190,7 +190,7 @@ class _OtpHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerHeight = screenHeight * 0.35;
+    final headerHeight = screenHeight * 0.25;
 
     return SizedBox(
       height: headerHeight,
@@ -206,8 +206,8 @@ class _OtpHeader extends StatelessWidget {
               padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: Image.asset(
                 'assets/logo/logo-light.png',
-                width: 93,
-                height: 35,
+                width: 220,
+                
                 fit: BoxFit.contain,
                 color: Colors.white,
                 colorBlendMode: BlendMode.srcIn,
