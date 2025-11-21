@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'verify_identity_screen.dart';
 
+/// Yeh screen user se company ki details capture karti hai
+/// taaki hum KYC flow start kar saken.
 class EmployeeIdScreen extends StatefulWidget {
   const EmployeeIdScreen({super.key});
 
@@ -9,9 +11,11 @@ class EmployeeIdScreen extends StatefulWidget {
 }
 
 class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
+  /// Default business name prefill taaki user ko context mile.
   final TextEditingController _businessNameController =
       TextEditingController(text: 'Nests India (nests)');
 
+  /// Agar user ke paas invite code hai to woh yahan type karega.
   final TextEditingController _businessCodeController =
       TextEditingController();
 
@@ -69,6 +73,7 @@ class _EmployeeContentCard extends StatelessWidget {
   final TextEditingController businessCodeController;
 
   void _handleContinue(BuildContext context) {
+    // Next step me jaane ke liye identity verification screen open karo.
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -107,6 +112,7 @@ class _EmployeeContentCard extends StatelessWidget {
           const _HeaderLogo(),
           const SizedBox(height: 20),
 
+          /// Headline copy jo user ko guide karti hai.
           const Text(
             "Enter Company Details",
             style: TextStyle(
@@ -213,6 +219,7 @@ class _CustomInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Simple text field jisme hum business name ya code le rahe hain.
     return TextField(
       controller: controller,
       decoration: InputDecoration(

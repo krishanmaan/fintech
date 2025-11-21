@@ -37,7 +37,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
             }
 
             // Build a static grid-based calendar that mimics the design spec.
-            List<Widget> _buildCalendarDays() {
+            List<Widget> buildCalendarDays() {
               final List<Widget> rows = [];
               const List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -163,7 +163,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  ..._buildCalendarDays(),
+                  ...buildCalendarDays(),
                   const SizedBox(height: 20),
                   Row(
                     children: [

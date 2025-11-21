@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'aadhaar_verify_identity_screen.dart';
 
+/// High-level intro screen jo user ko KYC ke next steps batata hai.
 class VerifyIdentityScreen extends StatefulWidget {
   const VerifyIdentityScreen({super.key});
 
@@ -70,14 +71,17 @@ class _ContentCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Branding logo ko upar center me dikhaya gaya hai.
           const _HeaderLogo(),
           const SizedBox(height: 40),
+          // Custom ID icon jo feel ko elevate karta hai.
           const _IdCardIcon(),
           const SizedBox(height: 40),
           const _KycTitle(),
           const SizedBox(height: 16),
           const _KycDescription(),
           const Spacer(),
+          // Button se Aadhaar verification step open hota hai.
           _VerifyNowButton(),
         ],
       ),
@@ -235,6 +239,7 @@ class _KycDescription extends StatelessWidget {
 }
 
 class _VerifyNowButton extends StatelessWidget {
+  /// CTA jo user ko actual verification wizard me le jata hai.
   @override
   Widget build(BuildContext context) {
     return SizedBox(
