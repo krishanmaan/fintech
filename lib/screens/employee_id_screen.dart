@@ -29,6 +29,7 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
           const Positioned.fill(child: _EmployeeGradientBackground()),
 
           SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 const SizedBox(height: 20),

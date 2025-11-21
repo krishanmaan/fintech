@@ -13,8 +13,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   /// User ka phone pre-fill kiya hua hai for faster testing/demo.
-  final TextEditingController _phoneController =
-      TextEditingController(text: '0987654321');
+ 
   /// Checkbox toggle maintain karne ke liye simple bool.
   bool _rememberMe = false;
 
@@ -67,10 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     TextField(
-                      controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
-                        hintText: '0987654321',
+                        hintText: '9876543210',
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 18,
@@ -215,7 +213,7 @@ class _LoginHeader extends StatelessWidget {
           ),
           Center(
             child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              padding: EdgeInsets.only(top:10),
               child: Image.asset(
                 'assets/logo/logo-light.png',
                 width: 220,

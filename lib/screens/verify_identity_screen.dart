@@ -19,6 +19,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         children: [
           const Positioned.fill(child: _VerifyGradientBackground()),
           SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 const SizedBox(height: 20),

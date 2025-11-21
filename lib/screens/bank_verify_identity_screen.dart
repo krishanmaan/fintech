@@ -27,6 +27,7 @@ class _BankVerifyIdentityScreenState extends State<BankVerifyIdentityScreen> {
         children: [
           const Positioned.fill(child: _BankGradientBackground()),
           SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 const SizedBox(height: 20),

@@ -25,6 +25,7 @@ class _AadhaarVerifyIdentityScreenState
           const Positioned.fill(child: _AadhaarGradientBackground()),
 
           SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 const SizedBox(height: 20),

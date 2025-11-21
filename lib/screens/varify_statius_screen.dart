@@ -48,6 +48,7 @@ class _VarifyStatiusScreenState extends State<VarifyStatiusScreen> {
           ),
         ),
         child: SafeArea(
+          bottom: false,
           child: Column(
             children: [
               const SizedBox(height: 20),

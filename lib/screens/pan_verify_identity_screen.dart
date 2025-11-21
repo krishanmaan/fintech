@@ -259,6 +259,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
         children: [
           const Positioned.fill(child: _PanGradientBackground()),
           SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 const SizedBox(height: 20),

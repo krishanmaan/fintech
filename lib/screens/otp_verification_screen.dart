@@ -51,7 +51,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           // Top header banner same style me rakha gaya hai.
           _OtpHeader(screenHeight: screenHeight),
           Expanded(
-            child: SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,9 +60,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   const Text(
                     'Verify OTP Now',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                       color: Color(0xFF171A58),
                     ),
                     textAlign: TextAlign.center,
@@ -71,21 +70,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   const Text(
                     'Enter the OTP code we just sent you on your registered Email/Phone number',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       color: Color(0xFF7D8CA1),
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 40),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(4, (index) {
                       return Container(
-                        margin: EdgeInsets.only(
-                          right: index < 3 ? 12 : 0,
-                        ),
-                        width: 60,
-                        height: 60,
+                        margin: EdgeInsets.only(right: index < 3 ? 16 : 0),
+                        width: 64,
+                        height: 64,
                         child: TextField(
                           controller: _otpControllers[index],
                           focusNode: _focusNodes[index],
@@ -93,8 +90,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           keyboardType: TextInputType.number,
                           maxLength: 1,
                           style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFF171A58),
                           ),
                           inputFormatters: [
@@ -105,14 +102,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             filled: true,
                             fillColor: Colors.white,
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                               borderSide: const BorderSide(
-                                color: Color(0xFF532C8C),
+                                color: Color(0xFFB08BFF),
                                 width: 1.5,
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                               borderSide: const BorderSide(
                                 color: Color(0xFF532C8C),
                                 width: 2,
@@ -124,62 +121,66 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       );
                     }),
                   ),
-                  const SizedBox(height: 48),
-                  SizedBox(
-                    width: double.infinity,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF532C8C), Color(0xFF171A58)],
-                        ),
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      child: TextButton(
-                        onPressed: () {
-                          // OTP match maan ke Employee ID step par jaa rahe hain.
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const EmployeeIdScreen(),
+                  const Spacer(),
+                  Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF532C8C), Color(0xFF171A58)],
                             ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          foregroundColor: Colors.white,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const EmployeeIdScreen(),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              foregroundColor: Colors.white,
+                              textStyle: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            child: const Text('Verify'),
                           ),
                         ),
-                        child: const Text('Verify'),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF7D8CA1),
-                      ),
-                      children: [
-                        const TextSpan(
-                          text: 'Don\'t get OTP? ',
-                        ),
-                        TextSpan(
-                          text: 'Resend OTP',
+                      const SizedBox(height: 16),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
                           style: const TextStyle(
-                            color: Color(0xFF532C8C),
-                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: Color(0xFF7D8CA1),
                           ),
-                          recognizer: TapGestureRecognizer()..onTap = () {},
+                          children: [
+                            const TextSpan(
+                              text: 'Don\'t get OTP? ',
+                            ),
+                            TextSpan(
+                              text: 'Resend OTP',
+                              style: const TextStyle(
+                                color: Color(0xFF1D4ED8),
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer: TapGestureRecognizer()..onTap = () {},
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 90),
+                    ],
                   ),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -211,7 +212,7 @@ class _OtpHeader extends StatelessWidget {
           ),
           Center(
             child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+              padding: EdgeInsets.only(top:10),
               child: Image.asset(
                 'assets/logo/logo-light.png',
                 width: 220,
