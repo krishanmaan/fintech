@@ -218,8 +218,8 @@ class _LoginHeader extends StatelessWidget {
               padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
               child: Image.asset(
                 'assets/logo/logo-light.png',
-                width: 293,
-                height: 235,
+                width: 220,
+                
                 fit: BoxFit.contain,
                 color: Colors.white,
                 colorBlendMode: BlendMode.srcIn,

@@ -96,7 +96,7 @@ class _HeaderLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       'assets/logo/logo-light.png',
-      width: 120,
+      width: 220,
       color: const Color(0xFF171A58),
       colorBlendMode: BlendMode.srcIn,
     );
