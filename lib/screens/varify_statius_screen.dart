@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'home.dart';
 
 /// Possible states for the KYC verification summary.
 enum KycStatus { completed, pending }
 
 /// Final status screen that shows whether KYC is pending or complete.
-class VarifyStatiusScreen extends StatelessWidget {
+class VarifyStatiusScreen extends StatefulWidget {
   final KycStatus status;
 
   const VarifyStatiusScreen({
@@ -13,8 +14,27 @@ class VarifyStatiusScreen extends StatelessWidget {
   });
 
   @override
+  State<VarifyStatiusScreen> createState() => _VarifyStatiusScreenState();
+}
+
+class _VarifyStatiusScreenState extends State<VarifyStatiusScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const HomeScreen(),
+        ),
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _StatusTheme theme = _StatusTheme.fromStatus(status);
+    final _StatusTheme theme = _StatusTheme.fromStatus(widget.status);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FC),
@@ -70,7 +90,7 @@ class VarifyStatiusScreen extends StatelessWidget {
                         /// Individual checklist item states.
                         _StatusListCard(theme: theme),
                         const Spacer(),
-                        _StatusFooter(status: status),
+                        _StatusFooter(status: widget.status),
                       ],
                     ),
                   ),

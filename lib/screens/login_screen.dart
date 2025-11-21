@@ -202,7 +202,7 @@ class _LoginHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerHeight = screenHeight * 0.25;
+    final headerHeight = screenHeight * 0.2;
     
     return SizedBox(
       height: headerHeight,
