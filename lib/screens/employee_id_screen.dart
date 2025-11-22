@@ -99,7 +99,7 @@ class _EmployeeContentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF171A58).withOpacity(0.08),
+            color: const Color(0xFF171A58).withValues(alpha: 0.08),
             blurRadius: 24,
             offset: const Offset(0, 14),
           ),

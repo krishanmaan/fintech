@@ -63,7 +63,7 @@ class _ContentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF171A58).withOpacity(0.08),
+            color: const Color(0xFF171A58).withValues(alpha: 0.08),
             blurRadius: 24,
             offset: const Offset(0, 14),
           ),
@@ -113,7 +113,7 @@ class _IdCardIcon extends StatelessWidget {
       width: 120,
       height: 120,
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withOpacity(0.1),
+        color: const Color(0xFF10B981).withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -135,7 +135,7 @@ class _IdCardIcon extends StatelessWidget {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -150,7 +150,7 @@ class _IdCardIcon extends StatelessWidget {
                         width: 30,
                         height: 3,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -159,7 +159,7 @@ class _IdCardIcon extends StatelessWidget {
                         width: 25,
                         height: 3,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),

@@ -78,7 +78,7 @@ class _AadhaarContentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF171A58).withOpacity(0.08),
+            color: const Color(0xFF171A58).withValues(alpha: 0.08),
             blurRadius: 24,
             offset: const Offset(0, 14),
           ),
@@ -322,7 +322,7 @@ class _VerificationProviderTile extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE4E7EC)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF101828).withOpacity(0.05),
+            color: const Color(0xFF101828).withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

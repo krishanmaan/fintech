@@ -258,7 +258,7 @@ class _OtpWavePainter extends CustomPainter {
     canvas.drawPath(mainWavePath, firstStrokePaint);
 
     final secondStrokePaint = Paint()
-      ..color = const Color(0xFFB8A8E0).withOpacity(0.5)
+      ..color = const Color(0xFFB8A8E0).withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 15
       ..strokeCap = StrokeCap.round
