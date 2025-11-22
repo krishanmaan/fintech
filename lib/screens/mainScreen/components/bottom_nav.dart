@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../utils/responsive.dart';
+import '../../../utils/responsive.dart';
 
 /// Bottom navigation bar component jo 4 tabs dikhata hai.
 class BottomNavBar extends StatelessWidget {

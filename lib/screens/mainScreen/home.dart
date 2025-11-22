@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../components/bottom_nav.dart';
-import '../utils/responsive.dart';
+import 'components/bottom_nav.dart';
+import '../../utils/responsive.dart';
+import 'withdraw.dart';
 
 /// Main home/dashboard screen jo user ko salary aur essentials dikhata hai.
 class HomeScreen extends StatelessWidget {
@@ -675,36 +676,47 @@ class _WithdrawButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: responsive.width(125),
-      height: responsive.height(31),
-      padding: EdgeInsets.only(
-        top: responsive.height(4),
-        right: responsive.width(12),
-        bottom: responsive.height(4),
-        left: responsive.width(12),
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF482983),
-        borderRadius: BorderRadius.circular(responsive.radius(14)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _WalletButtonIcon(responsive: responsive),
-          SizedBox(width: responsive.width(10)),
-          Text(
-            'Withdraw',
-            style: TextStyle(
-              fontSize: responsive.fontSize(12),
-              fontWeight: FontWeight.w600,
-              height: 1.3,
-              letterSpacing: 0,
-              color: const Color(0xFFFFFFFF),
-            ),
+    return GestureDetector(
+      onTap: () {
+        // Withdraw screen par navigate karo
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const WithdrawScreen(),
           ),
-        ],
+        );
+      },
+      child: Container(
+        width: responsive.width(125),
+        height: responsive.height(31),
+        padding: EdgeInsets.only(
+          top: responsive.height(4),
+          right: responsive.width(12),
+          bottom: responsive.height(4),
+          left: responsive.width(12),
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF482983),
+          borderRadius: BorderRadius.circular(responsive.radius(14)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _WalletButtonIcon(responsive: responsive),
+            SizedBox(width: responsive.width(10)),
+            Text(
+              'Withdraw',
+              style: TextStyle(
+                fontSize: responsive.fontSize(12),
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+                letterSpacing: 0,
+                color: const Color(0xFFFFFFFF),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
+import '../mainScreen/home.dart';
 
 /// Possible states for the KYC verification summary.
 enum KycStatus { completed, pending }
