@@ -212,7 +212,7 @@ class _OtpHeader extends StatelessWidget {
           ),
           Center(
             child: Padding(
-              padding: EdgeInsets.only(top:10),
+              padding: const EdgeInsets.only(top:10),
               child: Image.asset(
                 'assets/logo/logo-light.png',
                 width: 220,

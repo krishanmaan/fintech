@@ -179,7 +179,7 @@ class _IdCardIcon extends StatelessWidget {
                     child: const Icon(
                       Icons.check,
                       size: 12,
-                      color: Color(0xFF10B981),
+                      color: const Color(0xFF10B981),
                     ),
                   ),
                 ),
@@ -241,6 +241,8 @@ class _KycDescription extends StatelessWidget {
 
 class _VerifyNowButton extends StatelessWidget {
   /// CTA jo user ko actual verification wizard me le jata hai.
+  const _VerifyNowButton();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(

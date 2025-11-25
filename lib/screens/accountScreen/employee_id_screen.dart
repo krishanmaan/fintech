@@ -20,6 +20,13 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
       TextEditingController();
 
   @override
+  void dispose() {
+    _businessNameController.dispose();
+    _businessCodeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,

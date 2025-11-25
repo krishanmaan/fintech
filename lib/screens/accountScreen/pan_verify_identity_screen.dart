@@ -15,6 +15,12 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
   final TextEditingController _panController = TextEditingController();
   DateTime? _selectedDate;
 
+  @override
+  void dispose() {
+    _panController.dispose();
+    super.dispose();
+  }
+
   Future<void> _openDatePicker() async {
     DateTime tempSelected = _selectedDate ?? DateTime(2002, 5, 7);
     DateTime visibleMonth =

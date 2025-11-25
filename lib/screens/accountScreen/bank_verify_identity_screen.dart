@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'varify_statius_screen.dart';
+import 'verify_status_screen.dart';
 
 /// Final bank verification step in the KYC wizard.
 class BankVerifyIdentityScreen extends StatefulWidget {
@@ -17,6 +17,16 @@ class _BankVerifyIdentityScreenState extends State<BankVerifyIdentityScreen> {
   final TextEditingController _branchController = TextEditingController();
   final TextEditingController _cardController = TextEditingController();
   final TextEditingController _cvvController = TextEditingController();
+
+  @override
+  void dispose() {
+    _accountController.dispose();
+    _ifscController.dispose();
+    _branchController.dispose();
+    _cardController.dispose();
+    _cvvController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
