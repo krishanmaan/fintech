@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'components/bottom_nav.dart';
 import '../../utils/responsive.dart';
 import 'withdraw.dart';
+import 'profile_screen.dart';
 
 /// Main home/dashboard screen jo user ko salary aur essentials dikhata hai.
 class HomeScreen extends StatelessWidget {
@@ -15,7 +16,26 @@ class HomeScreen extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: const Color(0xFFF7F0FA),
-      bottomNavigationBar: BottomNavBar(responsive: responsive),
+      bottomNavigationBar: BottomNavBar(
+        responsive: responsive,
+        currentIndex: 0,
+        onTap: (index) {
+          // Handle navigation based on index
+          if (index == 3) {
+            // Navigate to Profile screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfileScreen(),
+              ),
+            );
+          }
+          // Other tabs can be handled here
+          // index 0: Home (current screen)
+          // index 1: Salary
+          // index 2: Explore cards
+        },
+      ),
       body: Stack(
         children: [
           // SVG background jo status bar area me bhi extend hota hai
