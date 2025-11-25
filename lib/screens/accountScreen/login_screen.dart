@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 import 'otp_verification_screen.dart';
 
 /// Basic login screen jahan se OTP flow kick off hota hai.
@@ -33,40 +34,52 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                     const SizedBox(height: 32),
-                    const Text(
-                      'LOGIN',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                        color: Color(0xFF171A58),
+                    FadeInAnimation(
+                      delay: const Duration(milliseconds: 100),
+                      child: const Text(
+                        'LOGIN',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          color: Color(0xFF171A58),
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Create an account or log in to explore about our app',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF7D8CA1),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Enter your mobile no',
+                    FadeInAnimation(
+                      delay: const Duration(milliseconds: 200),
+                      child: const Text(
+                        'Create an account or log in to explore about our app',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF101828),
+                          color: Color(0xFF7D8CA1),
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      keyboardType: TextInputType.phone,
+                    const SizedBox(height: 32),
+                    SlideInAnimation(
+                      delay: const Duration(milliseconds: 300),
+                      offsetY: 30,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Enter your mobile no',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF101828),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                         hintText: '9876543210',
                         contentPadding: const EdgeInsets.symmetric(
@@ -99,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onChanged: (value) {
                             setState(() {
                               _rememberMe = value ?? false;
-                            });
+                            }),
                           },
                         ),
                         const SizedBox(width: 4),
@@ -113,43 +126,50 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF532C8C), Color(0xFF171A58)],
-                          ),
-                          borderRadius: BorderRadius.circular(28),
+                    SlideInAnimation(
+                      delay: const Duration(milliseconds: 400),
+                      offsetY: 30,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF532C8C), Color(0xFF171A58)],
                         ),
-                        child: TextButton(
-                          onPressed: () {
-                              // Login button dabate hi OTP screen open karo.
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OtpVerificationScreen(),
-                              ),
-                            );
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            foregroundColor: Colors.white,
-                            textStyle: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                            // Login button dabate hi OTP screen open karo with animation
+                          Navigator.push(
+                            context,
+                            SmoothPageRoute(
+                              page: const OtpVerificationScreen(),
                             ),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          foregroundColor: Colors.white,
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
-                          child: const Text('Log In'),
                         ),
+                        child: const Text('Log In'),
+                      ),
+                    ),
                       ),
                     ),
                     const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          // Terms & conditions ko neeche center me show kar rahe hain.
+          ),// Terms & conditions ko neeche center me show kar rahe hain.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
             child: Center(

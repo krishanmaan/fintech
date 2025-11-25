@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 import 'verify_identity_screen.dart';
 
 /// Yeh screen user se company ki details capture karti hai

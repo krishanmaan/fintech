@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'pan_verify_identity_screen.dart';
 

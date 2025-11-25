@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 import 'aadhaar_verify_identity_screen.dart';
 
 /// High-level intro screen jo user ko KYC ke next steps batata hai.

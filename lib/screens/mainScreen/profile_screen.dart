@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../utils/animations.dart';
 import 'faqs_screen.dart';
 import 'transaction_history_screen.dart';
 
@@ -57,14 +58,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                        // Profile section with avatar, name, phone
-                        _buildProfileSection(),
+                        // Profile section with avatar, name, phone (animated)
+                        FadeInAnimation(
+                          delay: const Duration(milliseconds: 100),
+                          child: _buildProfileSection(),
+                        ),
 
-                        // Menu items
+                        // Menu items (animated)
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: _buildMenuItems(),
+                            child: FadeInAnimation(
+                              delay: const Duration(milliseconds: 200),
+                              child: _buildMenuItems(),
+                            ),
                           ),
                         ),
 
@@ -103,11 +110,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Transaction History icon (Rupee symbol in circle)
           GestureDetector(
             onTap: () {
-              // Navigate to Transaction History screen
+              // Navigate to Transaction History screen with animation
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const TransactionHistoryScreen(),
+                SmoothPageRoute(
+                  page: const TransactionHistoryScreen(),
                 ),
               );
             },
@@ -370,11 +377,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Navigate to refer and earn screen
         break;
       case 'FAQs':
-        // Navigate to FAQs screen
+        // Navigate to FAQs screen with animation
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const FaqsScreen(),
+          SmoothPageRoute(
+            page: const FaqsScreen(),
           ),
         );
         break;

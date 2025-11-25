@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 
 
 /// Transaction History screen showing all user transactions

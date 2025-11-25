@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 import 'package:flutter/services.dart';
 
 import 'employee_id_screen.dart';
@@ -137,9 +138,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EmployeeIdScreen(),
+                                SmoothPageRoute(
+                                  page: const EmployeeIdScreen(),
                                 ),
                               );
                             },
