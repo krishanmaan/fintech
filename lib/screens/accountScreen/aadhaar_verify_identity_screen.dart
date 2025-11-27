@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
 import 'pan_verify_identity_screen.dart';
 
-/// Aadhaar verification entry screen for the KYC funnel.
+
 class AadhaarVerifyIdentityScreen extends StatefulWidget {
   const AadhaarVerifyIdentityScreen({super.key});
 
@@ -45,7 +45,7 @@ class _AadhaarVerifyIdentityScreenState
   }
 }
 
-/// ---------------- BG GRADIENT ----------------
+
 class _AadhaarGradientBackground extends StatelessWidget {
   const _AadhaarGradientBackground();
 
@@ -63,7 +63,7 @@ class _AadhaarGradientBackground extends StatelessWidget {
   }
 }
 
-/// ---------------- CONTENT CARD ----------------
+
 class _AadhaarContentCard extends StatelessWidget {
   final TextEditingController aadhaarController;
 
@@ -115,7 +115,7 @@ class _AadhaarContentCard extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          /// Pre-selected verification provider tile.
+
           const SlideInAnimation(
             delay: Duration(milliseconds: 300),
             offsetY: 30,
@@ -151,7 +151,7 @@ class _AadhaarContentCard extends StatelessWidget {
 
           const Spacer(),
 
-          /// Continue to the PAN verification step.
+
           const SlideInAnimation(
             delay: Duration(milliseconds: 500),
             offsetY: 30,
@@ -163,7 +163,7 @@ class _AadhaarContentCard extends StatelessWidget {
   }
 }
 
-/// ---------------- AADHAAR INPUT FIELD ----------------
+
 class _AadhaarInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
@@ -197,7 +197,7 @@ class _AadhaarInputField extends StatelessWidget {
   }
 }
 
-/// ---------------- HEADER STEPS ----------------
+
 class _StepHeader extends StatelessWidget {
   const _StepHeader();
 
@@ -237,7 +237,7 @@ class _StepItem extends StatelessWidget {
     Color backgroundColor;
     Color textColor;
 
-    // Current step gets a soft fill while completed steps are fully colored.
+
     if (isCurrent) {
       backgroundColor = const Color(0xFFEDEBFF);
       textColor = activeColor;
@@ -292,7 +292,7 @@ class _StepConnector extends StatelessWidget {
   }
 }
 
-/// ---------------- VERIFY BUTTON ----------------
+
 class _VerifyButton extends StatelessWidget {
   const _VerifyButton();
 
@@ -401,7 +401,7 @@ const String _aadhaarSvgIcon = '''
 </svg>
 ''';
 
-/// ---------------- CUSTOM WAVE PAINTER ----------------
+
 class _AadhaarWavePainter extends CustomPainter {
   final double headerHeight;
 

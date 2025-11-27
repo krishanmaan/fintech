@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'employee_id_screen.dart';
 
-/// Login ke turant baad OTP verify karne wali screen.
+
 class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen({super.key});
 
@@ -14,10 +14,10 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-  /// 4 digit OTP ke liye controllers list.
+
   final List<TextEditingController> _otpControllers =
       List.generate(4, (_) => TextEditingController());
-  /// Har TextField ka individual focus manage karne ke liye nodes.
+
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   @override
@@ -33,11 +33,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   void _onOtpChanged(int index, String value) {
     if (value.isNotEmpty && index < 3) {
-      // Agla OTP box auto focus karo.
       _focusNodes[index + 1].requestFocus();
     }
     if (value.isEmpty && index > 0) {
-      // Backspace pe previous field pe jao.
       _focusNodes[index - 1].requestFocus();
     }
   }
@@ -49,7 +47,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Top header banner same style me rakha gaya hai.
           _OtpHeader(screenHeight: screenHeight),
           Expanded(
             child: Padding(
@@ -208,7 +205,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 class _OtpHeader extends StatelessWidget {
   final double screenHeight;
 
-  /// OTP screen ka hero area jo login wale se match karta hai.
   const _OtpHeader({required this.screenHeight});
 
   @override

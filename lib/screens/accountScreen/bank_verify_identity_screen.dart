@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
 import 'verify_status_screen.dart';
 
-/// Final bank verification step in the KYC wizard.
+
 class BankVerifyIdentityScreen extends StatefulWidget {
   const BankVerifyIdentityScreen({super.key});
 
@@ -137,7 +137,7 @@ class _BankContentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 28),
-            /// Bank selector tile – static for now.
+
             const SlideInAnimation(
               delay: Duration(milliseconds: 300),
               offsetY: 30,
@@ -188,7 +188,7 @@ class _BankContentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            /// Submit and move to the verification status summary.
+
             const SlideInAnimation(
               delay: Duration(milliseconds: 500),
               offsetY: 30,
@@ -417,7 +417,7 @@ class _StepItem extends StatelessWidget {
     Color backgroundColor;
     Color textColor;
 
-    // Completed steps are filled; current step gets a lighter background cue.
+
     if (isCurrent) {
       backgroundColor = const Color(0xFFEDEBFF);
       textColor = activeColor;

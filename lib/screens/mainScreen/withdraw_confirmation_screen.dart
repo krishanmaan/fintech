@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 class WithdrawConfirmationScreen extends StatefulWidget {
   final double withdrawAmount;
 
-  const WithdrawConfirmationScreen({
-    super.key,
-    required this.withdrawAmount,
-  });
+  const WithdrawConfirmationScreen({super.key, required this.withdrawAmount});
 
   @override
   State<WithdrawConfirmationScreen> createState() =>
@@ -92,7 +89,8 @@ class _WithdrawConfirmationScreenState
                                   selectedIndex: _selectedAccountIndex,
                                   onAccountSelected: (index) {
                                     setState(
-                                        () => _selectedAccountIndex = index);
+                                      () => _selectedAccountIndex = index,
+                                    );
                                   },
                                 ),
 
@@ -399,11 +397,14 @@ class _ReceivingAccountSection extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Radio(
-                      value: index,
-                      groupValue: selectedIndex,
-                      activeColor: const Color(0xFF482983),
-                      onChanged: (value) => onAccountSelected(value as int),
+                    Icon(
+                      selectedIndex == index
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      color: selectedIndex == index
+                          ? const Color(0xFF482983)
+                          : const Color(0xFF9CA3AF),
+                      size: 24,
                     ),
                   ],
                 ),
@@ -483,10 +484,7 @@ class _RepaymentBankSection extends StatelessWidget {
           const SizedBox(height: 8),
           const Text(
             'Current Month',
-            style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF6B7280),
-            ),
+            style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
           ),
           const SizedBox(height: 16),
           _buildRepaymentTable(),
@@ -559,7 +557,11 @@ class _RepaymentBankSection extends StatelessWidget {
   }
 
   Widget _buildTableRow(
-      String month, String principal, String interest, String total) {
+    String month,
+    String principal,
+    String interest,
+    String total,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -600,10 +602,7 @@ class _TermsCheckbox extends StatelessWidget {
   final bool agreed;
   final Function(bool?) onChanged;
 
-  const _TermsCheckbox({
-    required this.agreed,
-    required this.onChanged,
-  });
+  const _TermsCheckbox({required this.agreed, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -626,8 +625,7 @@ class _TermsCheckbox extends StatelessWidget {
                   height: 1.5,
                 ),
                 children: [
-                  TextSpan(
-                      text: 'By continuing, you agree to the updated '),
+                  TextSpan(text: 'By continuing, you agree to the updated '),
                   TextSpan(
                     text: 'Webfino',
                     style: TextStyle(

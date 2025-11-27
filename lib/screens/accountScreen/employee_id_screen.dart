@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
 import 'verify_identity_screen.dart';
 
-/// Yeh screen user se company ki details capture karti hai
-/// taaki hum KYC flow start kar saken.
+
 class EmployeeIdScreen extends StatefulWidget {
   const EmployeeIdScreen({super.key});
 
@@ -12,11 +11,11 @@ class EmployeeIdScreen extends StatefulWidget {
 }
 
 class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
-  /// Default business name prefill taaki user ko context mile.
+
   final TextEditingController _businessNameController =
       TextEditingController(text: 'Nests India (nests)');
 
-  /// Agar user ke paas invite code hai to woh yahan type karega.
+
   final TextEditingController _businessCodeController =
       TextEditingController();
 
@@ -42,7 +41,7 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
               children: [
                 const SizedBox(height: 20),
 
-                /// CARD FULL SCREEN TAK EXPAND
+
                 Expanded(
                   child: _EmployeeContentCard(
                     businessNameController: _businessNameController,
@@ -58,7 +57,7 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
   }
 }
 
-/// ------------------- GRADIENT BG --------------------------
+
 class _EmployeeGradientBackground extends StatelessWidget {
   const _EmployeeGradientBackground();
 
@@ -76,13 +75,13 @@ class _EmployeeGradientBackground extends StatelessWidget {
   }
 }
 
-/// ------------------- CONTENT CARD --------------------------
+
 class _EmployeeContentCard extends StatelessWidget {
   final TextEditingController businessNameController;
   final TextEditingController businessCodeController;
 
   void _handleContinue(BuildContext context) {
-    // Next step me jaane ke liye identity verification screen open karo.
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -114,14 +113,14 @@ class _EmployeeContentCard extends StatelessWidget {
         ],
       ),
 
-      /// COMPLETE UI INSIDE CARD
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const _HeaderLogo(),
           const SizedBox(height: 20),
 
-          /// Headline copy jo user ko guide karti hai.
+
           FadeInAnimation(
             delay: const Duration(milliseconds: 100),
             child: const Text(
@@ -153,7 +152,7 @@ class _EmployeeContentCard extends StatelessWidget {
             offsetY: 30,
             child: Column(
               children: [
-                /// Business Name
+
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -178,7 +177,7 @@ class _EmployeeContentCard extends StatelessWidget {
                     style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1))),
                 const SizedBox(height: 20),
 
-                /// Business Code
+
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -203,7 +202,7 @@ class _EmployeeContentCard extends StatelessWidget {
 
           const Spacer(),
 
-          /// Continue Button
+
           SlideInAnimation(
             delay: const Duration(milliseconds: 400),
             offsetY: 30,
@@ -217,7 +216,7 @@ class _EmployeeContentCard extends StatelessWidget {
   }
 }
 
-/// ------------------- HEADER LOGO --------------------------
+
 class _HeaderLogo extends StatelessWidget {
   const _HeaderLogo();
 
@@ -232,7 +231,7 @@ class _HeaderLogo extends StatelessWidget {
   }
 }
 
-/// ------------------- INPUT FIELD --------------------------
+
 class _CustomInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
@@ -246,7 +245,7 @@ class _CustomInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Simple text field jisme hum business name ya code le rahe hain.
+
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -264,7 +263,7 @@ class _CustomInputField extends StatelessWidget {
   }
 }
 
-/// ------------------- CONTINUE BUTTON --------------------------
+
 class _ContinueButton extends StatelessWidget {
   final VoidCallback onPressed;
 
@@ -300,7 +299,7 @@ class _ContinueButton extends StatelessWidget {
   }
 }
 
-/// ------------------- CUSTOM WAVE PAINTER --------------------------
+
 class _EmployeeWavePainter extends CustomPainter {
   final double headerHeight;
 

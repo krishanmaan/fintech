@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
 import 'bank_verify_identity_screen.dart';
 
-/// PAN verification screen – Step 2 of the KYC process.
+
 class PanVerifyIdentityScreen extends StatefulWidget {
   const PanVerifyIdentityScreen({super.key});
 
@@ -43,7 +43,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
               });
             }
 
-            // Build a static grid-based calendar that mimics the design spec.
+
             List<Widget> buildCalendarDays() {
               final List<Widget> rows = [];
               const List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -75,7 +75,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                   DateUtils.getDaysInMonth(visibleMonth.year, visibleMonth.month);
               final int offset = firstDay.weekday % 7;
               final int totalCells =
-                  (offset + totalDays) <= 35 ? 35 : 42; // ensure rows
+                  (offset + totalDays) <= 35 ? 35 : 42;
 
               List<Widget> dayCells = [];
               for (int index = 0; index < totalCells; index++) {
@@ -358,7 +358,7 @@ class _PanContentCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 28),
-          /// PAN verification provider selection.
+
           const SlideInAnimation(
             delay: Duration(milliseconds: 300),
             offsetY: 30,
@@ -402,7 +402,7 @@ class _PanContentCard extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          /// Proceed to the bank verification step.
+
           const SlideInAnimation(
             delay: Duration(milliseconds: 500),
             offsetY: 30,
@@ -620,7 +620,7 @@ class _StepItem extends StatelessWidget {
     Color backgroundColor;
     Color textColor;
 
-    // Keep current step highlighted softly while previous steps are solid purple.
+
     if (isCurrent) {
       backgroundColor = const Color(0xFFEDEBFF);
       textColor = activeColor;

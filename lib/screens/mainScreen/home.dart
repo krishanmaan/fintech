@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final responsive = Responsive(context);
     final statusBarHeight = MediaQuery.of(context).padding.top;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F0FA),
       bottomNavigationBar: BottomNavBar(
@@ -25,9 +25,7 @@ class HomeScreen extends StatelessWidget {
             // Navigate to Profile screen
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const ProfileScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           }
           // Other tabs can be handled here
@@ -62,87 +60,82 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: responsive.radius(42),
                   ),
                 ),
-            // Header content (profile + welcome text + icons)
-            Positioned(
-              top: responsive.height(20),
-              left: responsive.padding(24),
-              right: responsive.padding(24),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: responsive.width(57.76),
-                    height: responsive.width(57.76),
-                    child: CircleAvatar(
-                      radius: responsive.width(57.76) / 2,
-                      backgroundImage: const NetworkImage(
-                        'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200',
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: responsive.width(16)),
-                  Flexible(
-                    child: FittedBox(
-                      alignment: Alignment.centerLeft,
-                      fit: BoxFit.scaleDown,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Welcome,',
-                            style: TextStyle(
-                              fontSize: responsive.fontSize(20),
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
+                // Header content (profile + welcome text + icons)
+                Positioned(
+                  top: responsive.height(20),
+                  left: responsive.padding(24),
+                  right: responsive.padding(24),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: responsive.width(50),
+                        height: responsive.width(50),
+                        child: CircleAvatar(
+                          radius: responsive.width(50) / 2,
+                          backgroundImage: const NetworkImage(
+                            'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200',
                           ),
-                          SizedBox(height: responsive.height(5.47)),
-                          Text(
-                            'Nayan mishra',
-                            style: TextStyle(
-                              fontSize: responsive.fontSize(28),
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      SizedBox(width: responsive.width(12)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Welcome,',
+                              style: TextStyle(
+                                fontSize: responsive.fontSize(14),
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                            SizedBox(height: responsive.height(4)),
+                            Text(
+                              'Nayan mishra',
+                              style: TextStyle(
+                                fontSize: responsive.fontSize(18),
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _ActionIcon(child: _HelpIcon(responsive: responsive)),
+                      SizedBox(width: responsive.width(12)),
+                      _NotificationIcon(responsive: responsive),
+                    ],
                   ),
-                  const Spacer(),
-                  _ActionIcon(
-                    child: _HelpIcon(responsive: responsive),
-                  ),
-                  SizedBox(width: responsive.width(12)),
-                  _NotificationIcon(responsive: responsive),
-                ],
-              ),
-            ),
-            // Scrollable content area
-            Positioned(
-              top: responsive.height(100),
-              left: 0,
-              right: 0,
-              bottom: responsive.height(1), // Space for bottom nav
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: responsive.padding(24)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Monthly Salary Card
-                    _SummaryCard(responsive: responsive),
-                    SizedBox(height: responsive.height(20)),
-                    // Promotional banner slider
-                    _PromoBannerSlider(responsive: responsive),
-                    SizedBox(height: responsive.height(24)),
-                    // My Essentials Section
-                    _EssentialsSection(responsive: responsive),
-                    SizedBox(height: responsive.height(20)),
-                  ],
                 ),
-              ),
-            ),
+                // Scrollable content area
+                Positioned(
+                  top: responsive.height(100),
+                  left: 0,
+                  right: 0,
+                  bottom: responsive.height(1), // Space for bottom nav
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: responsive.padding(24),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Monthly Salary Card
+                        _SummaryCard(responsive: responsive),
+                        SizedBox(height: responsive.height(20)),
+                        // Promotional banner slider
+                        _PromoBannerSlider(responsive: responsive),
+                        SizedBox(height: responsive.height(24)),
+                        // My Essentials Section
+                        _EssentialsSection(responsive: responsive),
+                        SizedBox(height: responsive.height(20)),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -160,18 +153,17 @@ const String _headerSvg = '''
 ''';
 
 class _ActionIcon extends StatelessWidget {
-  const _ActionIcon({this.icon, this.child, this.responsive})
-      : assert(icon != null || child != null);
+  const _ActionIcon({this.icon, this.child})
+    : assert(icon != null || child != null);
 
   final IconData? icon;
   final Widget? child;
-  final Responsive? responsive;
 
   @override
   Widget build(BuildContext context) {
-    final r = responsive ?? Responsive(context);
+    final r = Responsive(context);
     final iconSize = r.width(40);
-    
+
     return SizedBox(
       width: iconSize,
       height: iconSize,
@@ -179,17 +171,10 @@ class _ActionIcon extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.15),
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.25),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
         ),
         child: Center(
-          child: child ??
-              Icon(
-                icon,
-                color: Colors.white,
-                size: r.fontSize(22),
-              ),
+          child: child ?? Icon(icon, color: Colors.white, size: r.fontSize(22)),
         ),
       ),
     );
@@ -204,76 +189,24 @@ class _HelpIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = responsive.width(20);
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        size: Size(size, size),
-        painter: _HelpIconPainter(),
-      ),
-    );
+    return SvgPicture.string(_helpIconSvg, width: size, height: size);
   }
 }
 
-class _HelpIconPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final strokePaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.12
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final radius = size.width * 0.25;
-    final tailHeight = size.height * 0.25;
-    final bodyHeight = size.height - tailHeight;
-
-    final path = Path()
-      ..moveTo(radius, 0)
-      ..lineTo(size.width - radius, 0)
-      ..quadraticBezierTo(size.width, 0, size.width, radius)
-      ..lineTo(size.width, bodyHeight - radius)
-      ..quadraticBezierTo(
-        size.width,
-        bodyHeight,
-        size.width - radius,
-        bodyHeight,
-      )
-      ..lineTo(size.width * 0.62, bodyHeight)
-      ..lineTo(size.width * 0.5, size.height)
-      ..lineTo(size.width * 0.38, bodyHeight)
-      ..lineTo(radius, bodyHeight)
-      ..quadraticBezierTo(0, bodyHeight, 0, bodyHeight - radius)
-      ..lineTo(0, radius)
-      ..quadraticBezierTo(0, 0, radius, 0)
-      ..close();
-
-    canvas.drawPath(path, strokePaint);
-
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: '?',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: size.width * 0.6,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    final textOffset = Offset(
-      (size.width - textPainter.width) / 2,
-      bodyHeight * 0.2 - textPainter.height * 0.15,
-    );
-
-    textPainter.paint(canvas, textOffset);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+const String _helpIconSvg = '''
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_213_994)">
+<path d="M9.80157 2.25586C11.6089 2.25586 14.1062 2.49357 14.9073 2.65379C14.9099 2.65417 14.9126 2.65492 14.9152 2.65529C16.0071 2.86717 17.1272 3.93669 17.3657 4.99385C17.621 6.22732 17.7411 7.45669 17.7438 8.86236C17.7411 10.2677 17.621 11.4974 17.3657 12.7309C17.1272 13.7877 16.0071 14.8576 14.9152 15.0694C14.9126 15.0698 14.9099 15.0706 14.9073 15.0709C14.4281 15.1668 13.4211 15.2806 12.3412 15.3611C11.8938 15.3944 11.488 15.637 11.2469 16.0154C11.1178 16.2179 10.98 16.4306 10.837 16.6473C10.362 17.3668 9.94083 17.965 9.58333 18.4292C9.22582 17.965 8.80468 17.3668 8.32963 16.6473C8.18663 16.4306 8.0485 16.2179 7.91972 16.0154C7.67864 15.637 7.27322 15.3944 6.8255 15.3611C5.74588 15.2806 4.73851 15.1668 4.25934 15.0709C4.25672 15.0706 4.2541 15.0698 4.25148 15.0694C3.1595 14.8576 2.03945 13.788 1.80099 12.7309C1.54569 11.4974 1.42552 10.268 1.4229 8.86236C1.42552 7.45669 1.54569 6.22732 1.80099 4.99385C2.03945 3.93706 3.1595 2.86755 4.25148 2.65566C4.2541 2.65529 4.25672 2.65454 4.25934 2.65417C5.06082 2.49395 7.55772 2.25623 9.36508 2.25623C9.43396 2.25623 9.50134 2.25624 9.5676 2.25736H9.58333C9.58333 2.25736 9.59381 2.25736 9.59905 2.25736C9.66531 2.25661 9.73269 2.25623 9.80157 2.25623M9.36508 0.833336C7.53526 0.833336 4.93616 1.06768 3.98045 1.2586C2.34829 1.57529 0.77041 3.06633 0.409912 4.69399C0.204769 5.68227 0.00299479 7.02693 0 8.86236C0.00299479 10.6978 0.204769 12.0421 0.409912 13.0304C0.77041 14.658 2.34829 16.1491 3.98045 16.4658C4.51727 16.5732 5.5733 16.6941 6.71956 16.7795C6.84946 16.9835 6.99021 17.2006 7.14257 17.4308C7.75089 18.3521 8.21658 18.9941 8.56921 19.4415C8.8627 19.8136 9.2232 19.9996 9.58333 19.9996C9.94345 19.9996 10.3039 19.8136 10.5974 19.4415C10.9501 18.9941 11.4154 18.3521 12.0241 17.4308C12.1764 17.2002 12.3168 16.9835 12.4471 16.7795C13.5937 16.6941 14.6494 16.5732 15.1866 16.4658C16.8187 16.1491 18.3966 14.658 18.7571 13.0304C18.9623 12.0421 19.164 10.6978 19.167 8.86236C19.164 7.02693 18.9623 5.68265 18.7571 4.69437C18.3966 3.0667 16.8187 1.57567 15.1866 1.25897C14.2305 1.06768 11.6314 0.833336 9.80157 0.833336C9.72745 0.833336 9.65483 0.83371 9.58333 0.834459C9.5122 0.83371 9.4392 0.833336 9.36508 0.833336Z" fill="white"/>
+<path d="M10.6422 14.4458C10.6018 14.6738 10.3951 14.8804 10.1672 14.9208C10.029 14.9437 9.84074 14.9654 9.58356 14.9657C9.32676 14.9657 9.13846 14.944 8.99995 14.9208C8.77197 14.8804 8.56533 14.6738 8.5249 14.4458C8.50207 14.3076 8.48035 14.1193 8.47998 13.8622C8.47998 13.6054 8.50169 13.4171 8.5249 13.2786C8.56533 13.0506 8.77197 12.8439 8.99995 12.8035C9.13809 12.7807 9.32638 12.759 9.58356 12.7586C9.84036 12.7586 10.0287 12.7803 10.1672 12.8035C10.3951 12.8439 10.6018 13.0506 10.6422 13.2786C10.6651 13.4167 10.6868 13.605 10.6871 13.8622C10.6871 14.119 10.6654 14.3073 10.6422 14.4458Z" fill="white"/>
+<path d="M9.54449 11.6295C9.18661 11.6295 8.87853 11.36 8.83847 10.9961C8.83323 10.9467 8.78943 10.4994 8.92682 9.96332C9.1226 9.20002 9.58305 8.61866 10.2584 8.28324C11.4945 7.66856 11.5903 6.97377 11.5903 6.77537C11.5903 6.62713 11.5319 6.30369 11.3137 6.03229C11.0209 5.66879 10.5141 5.48461 9.80691 5.48461C9.09977 5.48461 8.63071 5.7242 8.26422 6.21721C7.9902 6.58557 7.90297 6.95618 7.90222 6.95955C7.82099 7.344 7.44365 7.58958 7.05919 7.50797C6.67474 7.42673 6.42916 7.04902 6.51077 6.66493C6.525 6.59718 6.66425 5.98512 7.12283 5.36819C7.56606 4.77223 8.3915 4.06171 9.80728 4.06171C12.3435 4.06171 13.0136 5.8365 13.0136 6.77462C13.0136 7.29384 12.8069 8.60443 10.8925 9.55603C10.1603 9.9199 10.252 10.8303 10.2531 10.8393C10.2962 11.2297 10.0147 11.5813 9.62423 11.6243C9.59765 11.6273 9.57144 11.6288 9.54524 11.6288L9.54449 11.6295Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_213_994">
+<rect width="20" height="20" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+''';
 
 class _NotificationIcon extends StatelessWidget {
   const _NotificationIcon({required this.responsive});
@@ -282,29 +215,44 @@ class _NotificationIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        _ActionIcon(
-          icon: Icons.notifications_none,
-          responsive: responsive,
+    final iconSize = responsive.width(40);
+    final size = responsive.width(20);
+
+    return SizedBox(
+      width: iconSize,
+      height: iconSize,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
         ),
-        Positioned(
-          top: responsive.width(6),
-          right: responsive.width(6),
-          child: Container(
-            width: responsive.width(12),
-            height: responsive.width(12),
-            decoration: const BoxDecoration(
-              color: Color(0xFFE74C3C),
-              shape: BoxShape.circle,
-            ),
+        child: Center(
+          child: SvgPicture.string(
+            _notificationIconSvg,
+            width: size,
+            height: size,
           ),
         ),
-      ],
+      ),
     );
   }
 }
+
+const String _notificationIconSvg = '''
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_213_1001)">
+<path d="M8.55664 17.5C8.70293 17.7533 8.91332 17.9637 9.16668 18.11C9.42003 18.2563 9.70743 18.3333 9.99997 18.3333C10.2925 18.3333 10.5799 18.2563 10.8333 18.11C11.0866 17.9637 11.297 17.7533 11.4433 17.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M11.5965 1.92822C10.8444 1.67478 10.0427 1.60402 9.25788 1.72179C8.47301 1.83956 7.72746 2.14247 7.08286 2.60548C6.43826 3.06849 5.91314 3.67829 5.55092 4.38447C5.1887 5.09065 4.99979 5.8729 4.99981 6.66656C4.99981 10.4157 3.82398 11.6299 2.71648 12.7724C2.60779 12.8918 2.53615 13.0403 2.51028 13.1997C2.4844 13.3591 2.50541 13.5226 2.57074 13.6703C2.63606 13.818 2.7429 13.9435 2.87826 14.0316C3.01361 14.1197 3.17164 14.1666 3.33314 14.1666H16.6665C16.828 14.1666 16.986 14.1197 17.1214 14.0316C17.2567 13.9435 17.3636 13.818 17.4289 13.6703C17.4942 13.5226 17.5152 13.3591 17.4893 13.1997C17.4635 13.0403 17.3918 12.8918 17.2831 12.7724C17.1116 12.5958 16.949 12.4108 16.7956 12.2182" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M15 9.16671C16.3807 9.16671 17.5 8.04742 17.5 6.66671C17.5 5.286 16.3807 4.16671 15 4.16671C13.6193 4.16671 12.5 5.286 12.5 6.66671C12.5 8.04742 13.6193 9.16671 15 9.16671Z" fill="#DF232C"/>
+</g>
+<defs>
+<clipPath id="clip0_213_1001">
+<rect width="20" height="20" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+''';
 
 class _SummaryCard extends StatelessWidget {
   const _SummaryCard({required this.responsive});
@@ -316,7 +264,7 @@ class _SummaryCard extends StatelessWidget {
     final cardWidth = responsive.screenWidth - (responsive.padding(24) * 2);
     final cardHeight = responsive.height(180);
     final cardRadius = responsive.radius(15.64);
-    
+
     return Container(
       width: cardWidth,
       height: cardHeight,
@@ -377,7 +325,7 @@ class _SummaryCard extends StatelessWidget {
             ),
             // Timeline component
             Positioned(
-              top: responsive.height(90), 
+              top: responsive.height(90),
               left: responsive.width(18),
               child: _TimelineComponent(responsive: responsive),
             ),
@@ -409,7 +357,7 @@ class _SalaryComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final componentWidth = responsive.width(142);
     final componentHeight = responsive.height(81);
-    
+
     return SizedBox(
       width: componentWidth,
       height: componentHeight,
@@ -506,12 +454,7 @@ class _PurpleShapePainter extends CustomPainter {
         size.height,
       )
       ..lineTo(radius, size.height)
-      ..quadraticBezierTo(
-        0,
-        size.height,
-        0,
-        size.height - radius,
-      )
+      ..quadraticBezierTo(0, size.height, 0, size.height - radius)
       ..close();
 
     canvas.drawPath(path, paint);
@@ -529,11 +472,7 @@ class _VisibilityIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = responsive.width(20);
-    return SvgPicture.string(
-      _visibilityIconSvg,
-      width: size,
-      height: size,
-    );
+    return SvgPicture.string(_visibilityIconSvg, width: size, height: size);
   }
 }
 
@@ -592,7 +531,7 @@ class _TimelineComponent extends StatelessWidget {
     final barHeightTall = responsive.height(17);
     final barGap = responsive.width(4);
     final barRadius = responsive.radius(22);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -701,9 +640,7 @@ class _WithdrawButton extends StatelessWidget {
         // Withdraw screen par navigate karo
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => const WithdrawScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const WithdrawScreen()),
         );
       },
       child: Container(
@@ -750,11 +687,7 @@ class _WalletButtonIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = responsive.width(14);
-    return SvgPicture.string(
-      _walletButtonIconSvg,
-      width: size,
-      height: size,
-    );
+    return SvgPicture.string(_walletButtonIconSvg, width: size, height: size);
   }
 }
 
@@ -844,7 +777,9 @@ class _ApplyOfferButton extends StatelessWidget {
         left: responsive.width(9),
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFB703), // hsba(43, 99%, 100%, 1) - bright yellow-orange
+        color: const Color(
+          0xFFFFB703,
+        ), // hsba(43, 99%, 100%, 1) - bright yellow-orange
         borderRadius: BorderRadius.circular(responsive.radius(4)),
       ),
       child: Center(
@@ -885,7 +820,7 @@ class _PromoBannerSliderState extends State<_PromoBannerSlider> {
   Widget build(BuildContext context) {
     final responsive = widget.responsive;
     final bannerHeight = responsive.height(125);
-    
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -900,10 +835,7 @@ class _PromoBannerSliderState extends State<_PromoBannerSlider> {
             },
             itemCount: _totalSlides,
             itemBuilder: (context, index) {
-              return _PromoBanner(
-                responsive: responsive,
-                slideIndex: index,
-              );
+              return _PromoBanner(responsive: responsive, slideIndex: index);
             },
           ),
         ),
@@ -933,10 +865,7 @@ class _PromoBannerSliderState extends State<_PromoBannerSlider> {
 }
 
 class _PromoBanner extends StatelessWidget {
-  const _PromoBanner({
-    required this.responsive,
-    this.slideIndex = 0,
-  });
+  const _PromoBanner({required this.responsive, this.slideIndex = 0});
 
   final Responsive responsive;
   final int slideIndex;
@@ -945,7 +874,7 @@ class _PromoBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final bannerWidth = responsive.screenWidth - (responsive.padding(24) * 2);
     final bannerHeight = responsive.height(125);
-    
+
     return Container(
       width: bannerWidth,
       height: bannerHeight,
@@ -955,7 +884,10 @@ class _PromoBanner extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          stops: [0.5963, 1.0], // 59.63% to 100% (163.51% in CSS means end of container)
+          stops: [
+            0.5963,
+            1.0,
+          ], // 59.63% to 100% (163.51% in CSS means end of container)
           colors: [
             Color(0xFFFFC400), // #FFC400 at 59.63%
             Color(0xFFFF5500), // #FF5500 at end
@@ -978,7 +910,9 @@ class _PromoBanner extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                     height: 1.0, // 100% line height
                     letterSpacing: 0,
-                    color: const Color(0xFF4A148C), // Purple (hsba(267, 86%, 55%, 1))
+                    color: const Color(
+                      0xFF4A148C,
+                    ), // Purple (hsba(267, 86%, 55%, 1))
                   ),
                   children: [
                     const TextSpan(text: 'Navratri Personal\n'),
@@ -990,7 +924,9 @@ class _PromoBanner extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         height: 1.0,
                         letterSpacing: 0,
-                        color: const Color(0xFFCE3A3A), // Reddish-orange for "20% OFF"
+                        color: const Color(
+                          0xFFCE3A3A,
+                        ), // Reddish-orange for "20% OFF"
                       ),
                     ),
                   ],
@@ -1037,9 +973,7 @@ class _GoddessImage extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) {
               // Final fallback - simple placeholder
               return Container(
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                ),
+                decoration: BoxDecoration(color: Colors.transparent),
                 child: const Icon(
                   Icons.image_outlined,
                   color: Colors.white70,
@@ -1177,7 +1111,6 @@ class _EssentialCard extends StatelessWidget {
     );
   }
 }
-
 
 const String _digitalGoldSvg = '''
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">

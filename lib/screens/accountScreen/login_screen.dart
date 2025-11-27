@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
 import 'otp_verification_screen.dart';
 
-/// Basic login screen jahan se OTP flow kick off hota hai.
-/// App ka landing auth screen jahan se journey start hoti hai.
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -13,9 +12,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  /// User ka phone pre-fill kiya hua hai for faster testing/demo.
 
-  /// Checkbox toggle maintain karne ke liye simple bool.
+
   bool _rememberMe = false;
 
   @override
@@ -25,7 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Upper banner with branding aur wavy background.
           _LoginHeader(screenHeight: screenHeight),
           Expanded(
             child: SingleChildScrollView(
@@ -140,7 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: TextButton(
                           onPressed: () {
-                            // Login button dabate hi OTP screen open karo with animation
                             Navigator.push(
                               context,
                               SmoothPageRoute(
@@ -166,7 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          // Terms & conditions ko neeche center me show kar rahe hain.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
             child: Center(
@@ -210,7 +205,6 @@ class _LoginScreenState extends State<LoginScreen> {
 class _LoginHeader extends StatelessWidget {
   final double screenHeight;
 
-  /// Hero section jo purple wave + logo show karta hai.
   const _LoginHeader({required this.screenHeight});
 
   @override

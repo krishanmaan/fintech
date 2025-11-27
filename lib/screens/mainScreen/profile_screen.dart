@@ -4,8 +4,6 @@ import '../../../utils/animations.dart';
 import 'faqs_screen.dart';
 import 'transaction_history_screen.dart';
 
-
-
 /// Profile screen with user details and menu options
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 // Header with back button and notification icon
                 _buildHeader(context),
-
 
                 // Profile title
                 const Text(
@@ -113,16 +110,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Navigate to Transaction History screen with animation
               Navigator.push(
                 context,
-                SmoothPageRoute(
-                  page: const TransactionHistoryScreen(),
-                ),
+                SmoothPageRoute(page: const TransactionHistoryScreen()),
               );
             },
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(shape: BoxShape.circle),
               child: SvgPicture.string(
                 _transactionHistoryIcon,
                 width: 24,
@@ -216,10 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Phone number
           const Text(
             '+91 8855661155',
-            style: TextStyle(
-              fontSize: 13,
-              color: Color(0xFF6B7280),
-            ),
+            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
           ),
 
           const SizedBox(height: 16),
@@ -316,9 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ),
+        decoration: BoxDecoration(color: Colors.white),
         child: Row(
           children: [
             // Icon container
@@ -329,11 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: color.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 18,
-                color: color,
-              ),
+              child: Icon(icon, size: 18, color: color),
             ),
 
             const SizedBox(width: 14),
@@ -351,11 +335,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
 
             // Arrow icon
-            Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: Colors.grey.shade400,
-            ),
+            Icon(Icons.chevron_right, size: 20, color: Colors.grey.shade400),
           ],
         ),
       ),
@@ -378,12 +358,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         break;
       case 'FAQs':
         // Navigate to FAQs screen with animation
-        Navigator.push(
-          context,
-          SmoothPageRoute(
-            page: const FaqsScreen(),
-          ),
-        );
+        Navigator.push(context, SmoothPageRoute(page: const FaqsScreen()));
         break;
       case 'Contact Us':
         // Navigate to contact us screen
@@ -398,47 +373,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showLanguageDialog() {
+    String selectedLanguage = 'English';
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Select Language',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildLanguageOption('English', true),
-            _buildLanguageOption('हिंदी', false),
-            _buildLanguageOption('मराठी', false),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Select Language',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildLanguageOptionStateful('English', selectedLanguage, (
+                value,
+              ) {
+                setDialogState(() => selectedLanguage = value!);
+              }),
+              _buildLanguageOptionStateful('हिंदी', selectedLanguage, (value) {
+                setDialogState(() => selectedLanguage = value!);
+              }),
+              _buildLanguageOptionStateful('मराठी', selectedLanguage, (value) {
+                setDialogState(() => selectedLanguage = value!);
+              }),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // Save language preference: selectedLanguage
+              },
+              child: const Text('Save'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Save language preference
-            },
-            child: const Text('Save'),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildLanguageOption(String language, bool isSelected) {
+  Widget _buildLanguageOptionStateful(
+    String language,
+    String selectedLanguage,
+    ValueChanged<String?> onChanged,
+  ) {
     return ListTile(
       title: Text(language),
-      leading: Radio(
-        value: isSelected,
-        groupValue: true,
+      leading: Radio<String>(
+        value: language,
+        groupValue: selectedLanguage,
         activeColor: const Color(0xFF482983),
-        onChanged: (value) {},
+        onChanged: onChanged,
       ),
     );
   }

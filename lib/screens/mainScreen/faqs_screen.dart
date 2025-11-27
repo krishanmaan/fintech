@@ -174,7 +174,7 @@ class _FaqsScreenState extends State<FaqsScreen> {
                               faq['question']!,
                               faq['answer']!,
                             );
-                          }).toList(),
+                          }),
 
                           const SizedBox(height: 40),
                         ],

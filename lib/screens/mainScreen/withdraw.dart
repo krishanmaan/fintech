@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'withdraw_confirmation_screen.dart';
 
-
 /// Withdraw money screen with beautiful gradient header and triangle design
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({super.key});
@@ -217,20 +216,13 @@ class _NoteBanner extends StatelessWidget {
           const Expanded(
             child: Text(
               'Your withdrawal limit may differ from your actual salary, as determined by your employer.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF7D8CA1),
-              ),
+              style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
             ),
           ),
           const SizedBox(width: 8),
           GestureDetector(
             onTap: onDismiss,
-            child: const Icon(
-              Icons.close,
-              size: 20,
-              color: Color(0xFF7D8CA1),
-            ),
+            child: const Icon(Icons.close, size: 20, color: Color(0xFF7D8CA1)),
           ),
         ],
       ),
@@ -333,7 +325,7 @@ class _WithdrawalAmountCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${maxAmount.toStringAsFixed(0)}',
+                    '₹${maxAmount.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -399,11 +391,7 @@ class _WithdrawalAmountCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 8),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.arrow_forward, size: 16, color: Colors.white),
                 ],
               ),
             ),
@@ -416,10 +404,7 @@ class _WithdrawalAmountCard extends StatelessWidget {
 
 /// Quick amount selection button
 class _QuickAmountButton extends StatelessWidget {
-  const _QuickAmountButton({
-    required this.amount,
-    required this.onTap,
-  });
+  const _QuickAmountButton({required this.amount, required this.onTap});
 
   final double amount;
   final VoidCallback onTap;
@@ -474,10 +459,7 @@ class _PromoBanner extends StatelessWidget {
               children: [
                 const Text(
                   'Need more money?',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF482983),
-                  ),
+                  style: TextStyle(fontSize: 14, color: Color(0xFF482983)),
                 ),
                 const SizedBox(height: 8),
                 const Text(
