@@ -14,7 +14,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   /// User ka phone pre-fill kiya hua hai for faster testing/demo.
- 
+
   /// Checkbox toggle maintain karne ke liye simple bool.
   bool _rememberMe = false;
 
@@ -33,143 +33,140 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    const SizedBox(height: 32),
-                    FadeInAnimation(
-                      delay: const Duration(milliseconds: 100),
-                      child: const Text(
-                        'LOGIN',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                          color: Color(0xFF171A58),
-                        ),
-                        textAlign: TextAlign.center,
+                  const SizedBox(height: 32),
+                  FadeInAnimation(
+                    delay: const Duration(milliseconds: 100),
+                    child: const Text(
+                      'LOGIN',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                        color: Color(0xFF171A58),
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
-                    FadeInAnimation(
-                      delay: const Duration(milliseconds: 200),
-                      child: const Text(
-                        'Create an account or log in to explore about our app',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF7D8CA1),
+                  ),
+                  const SizedBox(height: 12),
+                  FadeInAnimation(
+                    delay: const Duration(milliseconds: 200),
+                    child: const Text(
+                      'Create an account or log in to explore about our app',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF7D8CA1)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SlideInAnimation(
+                    delay: const Duration(milliseconds: 300),
+                    offsetY: 30,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Enter your mobile no',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF101828),
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    SlideInAnimation(
-                      delay: const Duration(milliseconds: 300),
-                      offsetY: 30,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Enter your mobile no',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF101828),
+                        const SizedBox(height: 8),
+                        TextField(
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: '9876543210',
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 18,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(28),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(28),
+                              borderSide: const BorderSide(
+                                color: Color(0xFF532C8C),
+                                width: 1.5,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          TextField(
-                            keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        hintText: '9876543210',
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
                         ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(28),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE2E8F0),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(28),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF532C8C),
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          activeColor: const Color(0xFF532C8C),
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            }),
-                          },
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'Remember me',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF475467),
-                          ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _rememberMe,
+                              activeColor: const Color(0xFF532C8C),
+                              onChanged: (value) {
+                                setState(() {
+                                  _rememberMe = value ?? false;
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              'Remember me',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF475467),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    SlideInAnimation(
-                      delay: const Duration(milliseconds: 400),
-                      offsetY: 30,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF532C8C), Color(0xFF171A58)],
-                        ),
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      child: TextButton(
-                        onPressed: () {
-                            // Login button dabate hi OTP screen open karo with animation
-                          Navigator.push(
-                            context,
-                            SmoothPageRoute(
-                              page: const OtpVerificationScreen(),
-                            ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          foregroundColor: Colors.white,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                  ),
+                  const SizedBox(height: 16),
+                  SlideInAnimation(
+                    delay: const Duration(milliseconds: 400),
+                    offsetY: 30,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF532C8C), Color(0xFF171A58)],
                           ),
+                          borderRadius: BorderRadius.circular(28),
                         ),
-                        child: const Text('Log In'),
+                        child: TextButton(
+                          onPressed: () {
+                            // Login button dabate hi OTP screen open karo with animation
+                            Navigator.push(
+                              context,
+                              SmoothPageRoute(
+                                page: const OtpVerificationScreen(),
+                              ),
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          child: const Text('Log In'),
+                        ),
                       ),
                     ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
-          ),// Terms & conditions ko neeche center me show kar rahe hain.
+          ),
+          // Terms & conditions ko neeche center me show kar rahe hain.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
             child: Center(
@@ -181,9 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Color(0xFF7D8CA1),
                   ),
                   children: [
-                    const TextSpan(
-                      text: 'By signing up, you agree to the ',
-                    ),
+                    const TextSpan(text: 'By signing up, you agree to the '),
                     TextSpan(
                       text: 'Terms of Service',
                       style: const TextStyle(
@@ -214,14 +209,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
 class _LoginHeader extends StatelessWidget {
   final double screenHeight;
-  
+
   /// Hero section jo purple wave + logo show karta hai.
   const _LoginHeader({required this.screenHeight});
 
   @override
   Widget build(BuildContext context) {
     final headerHeight = screenHeight * 0.2;
-    
+
     return SizedBox(
       height: headerHeight,
       width: double.infinity,
@@ -233,11 +228,10 @@ class _LoginHeader extends StatelessWidget {
           ),
           Center(
             child: Padding(
-              padding: EdgeInsets.only(top:10),
+              padding: const EdgeInsets.only(top: 10),
               child: Image.asset(
                 'assets/logo/logo-light.png',
                 width: 220,
-                
                 fit: BoxFit.contain,
                 color: Colors.white,
                 colorBlendMode: BlendMode.srcIn,
@@ -387,4 +381,3 @@ class _HeaderWavePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

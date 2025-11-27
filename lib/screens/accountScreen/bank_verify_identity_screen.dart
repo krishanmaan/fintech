@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../utils/animations.dart';
 import 'verify_status_screen.dart';
 
 /// Final bank verification step in the KYC wizard.
@@ -113,63 +114,86 @@ class _BankContentCard extends StatelessWidget {
           children: [
             const _StepHeader(),
             const SizedBox(height: 28),
-            const Text(
-              "Add your Bank",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF101828),
+            FadeInAnimation(
+              delay: const Duration(milliseconds: 100),
+              child: const Text(
+                "Add your Bank",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF101828),
+                ),
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
-              "Please provide you bank details",
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF7D8CA1),
+            FadeInAnimation(
+              delay: const Duration(milliseconds: 200),
+              child: const Text(
+                "Please provide you bank details",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF7D8CA1),
+                ),
               ),
             ),
             const SizedBox(height: 28),
             /// Bank selector tile – static for now.
-            const _BankProviderTile(),
+            const SlideInAnimation(
+              delay: Duration(milliseconds: 300),
+              offsetY: 30,
+              child: _BankProviderTile(),
+            ),
             const SizedBox(height: 24),
-            const _FieldLabel("Account Number"),
-            const SizedBox(height: 8),
-            _FormInputField(
-              controller: accountController,
-              hint: "Add account number",
-            ),
-            const SizedBox(height: 20),
-            const _FieldLabel("IFC Code"),
-            const SizedBox(height: 8),
-            _FormInputField(
-              controller: ifscController,
-              hint: "Add ifc code",
-            ),
-            const SizedBox(height: 20),
-            const _FieldLabel("Branch"),
-            const SizedBox(height: 8),
-            _FormInputField(
-              controller: branchController,
-              hint: "write branch",
-            ),
-            const SizedBox(height: 20),
-            const _FieldLabel("Card Number"),
-            const SizedBox(height: 8),
-            _FormInputField(
-              controller: cardController,
-              hint: "Card Number",
-            ),
-            const SizedBox(height: 20),
-            const _FieldLabel("Cvv"),
-            const SizedBox(height: 8),
-            _CvvInputField(
-              controller: cvvController,
-              hint: "Add cvv number",
+            SlideInAnimation(
+              delay: const Duration(milliseconds: 400),
+              offsetY: 30,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _FieldLabel("Account Number"),
+                  const SizedBox(height: 8),
+                  _FormInputField(
+                    controller: accountController,
+                    hint: "Add account number",
+                  ),
+                  const SizedBox(height: 20),
+                  const _FieldLabel("IFC Code"),
+                  const SizedBox(height: 8),
+                  _FormInputField(
+                    controller: ifscController,
+                    hint: "Add ifc code",
+                  ),
+                  const SizedBox(height: 20),
+                  const _FieldLabel("Branch"),
+                  const SizedBox(height: 8),
+                  _FormInputField(
+                    controller: branchController,
+                    hint: "write branch",
+                  ),
+                  const SizedBox(height: 20),
+                  const _FieldLabel("Card Number"),
+                  const SizedBox(height: 8),
+                  _FormInputField(
+                    controller: cardController,
+                    hint: "Card Number",
+                  ),
+                  const SizedBox(height: 20),
+                  const _FieldLabel("Cvv"),
+                  const SizedBox(height: 8),
+                  _CvvInputField(
+                    controller: cvvController,
+                    hint: "Add cvv number",
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 32),
             /// Submit and move to the verification status summary.
-            const _VerifyButton(),
+            const SlideInAnimation(
+              delay: Duration(milliseconds: 500),
+              offsetY: 30,
+              child: _VerifyButton(),
+            ),
           ],
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../utils/animations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../utils/animations.dart';
 import 'bank_verify_identity_screen.dart';
 
 /// PAN verification screen – Step 2 of the KYC process.
@@ -335,56 +335,79 @@ class _PanContentCard extends StatelessWidget {
         children: [
           const _StepHeader(),
           const SizedBox(height: 28),
-          const Text(
-            "Identity Verification",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF101828),
+          FadeInAnimation(
+            delay: const Duration(milliseconds: 100),
+            child: const Text(
+              "Identity Verification",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF101828),
+              ),
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            "Please provide you aadhar details",
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF7D8CA1),
+          FadeInAnimation(
+            delay: const Duration(milliseconds: 200),
+            child: const Text(
+              "Please provide you aadhar details",
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF7D8CA1),
+              ),
             ),
           ),
           const SizedBox(height: 28),
           /// PAN verification provider selection.
-          const _VerificationProviderTile(),
+          const SlideInAnimation(
+            delay: Duration(milliseconds: 300),
+            offsetY: 30,
+            child: _VerificationProviderTile(),
+          ),
           const SizedBox(height: 24),
-          const Text(
-            "Pan Number",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF374151),
+          SlideInAnimation(
+            delay: const Duration(milliseconds: 400),
+            offsetY: 30,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Pan Number",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF374151),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _PanInputField(
+                  controller: panController,
+                  hint: "Enter pan number",
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Date Of Birth",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF374151),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _DateInputField(
+                  label: dateLabel,
+                  onTap: onPickDate,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          _PanInputField(
-            controller: panController,
-            hint: "Enter pan number",
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            "Date Of Birth",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF374151),
-            ),
-          ),
-          const SizedBox(height: 8),
-          _DateInputField(
-            label: dateLabel,
-            onTap: onPickDate,
           ),
           const Spacer(),
           /// Proceed to the bank verification step.
-          const _VerifyButton(),
+          const SlideInAnimation(
+            delay: Duration(milliseconds: 500),
+            offsetY: 30,
+            child: _VerifyButton(),
+          ),
         ],
       ),
     );

@@ -122,76 +122,94 @@ class _EmployeeContentCard extends StatelessWidget {
           const SizedBox(height: 20),
 
           /// Headline copy jo user ko guide karti hai.
-          const Text(
-            "Enter Company Details",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF101828),
+          FadeInAnimation(
+            delay: const Duration(milliseconds: 100),
+            child: const Text(
+              "Enter Company Details",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF101828),
+              ),
             ),
           ),
 
           const SizedBox(height: 8),
-          const Text(
-            "Add Your Workplace Info",
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF7D8CA1),
+          FadeInAnimation(
+            delay: const Duration(milliseconds: 200),
+            child: const Text(
+              "Add Your Workplace Info",
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF7D8CA1),
+              ),
             ),
           ),
 
           const SizedBox(height: 30),
 
-          /// Business Name
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Business name",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-                fontWeight: FontWeight.w600,
-              ),
+          SlideInAnimation(
+            delay: const Duration(milliseconds: 300),
+            offsetY: 30,
+            child: Column(
+              children: [
+                /// Business Name
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Business name",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                _CustomInputField(
+                  controller: businessNameController,
+                  hint: "Search Business",
+                  icon: Icons.search,
+                ),
+
+                const SizedBox(height: 20),
+                const Text("Or",
+                    style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1))),
+                const SizedBox(height: 20),
+
+                /// Business Code
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Business Code",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                _CustomInputField(
+                  controller: businessCodeController,
+                  hint: "",
+                  icon: Icons.info_outline,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-
-          _CustomInputField(
-            controller: businessNameController,
-            hint: "Search Business",
-            icon: Icons.search,
-          ),
-
-          const SizedBox(height: 20),
-          const Text("Or",
-              style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1))),
-          const SizedBox(height: 20),
-
-          /// Business Code
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Business Code",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          _CustomInputField(
-            controller: businessCodeController,
-            hint: "",
-            icon: Icons.info_outline,
           ),
 
           const Spacer(),
 
           /// Continue Button
-          _ContinueButton(
-            onPressed: () => _handleContinue(context),
+          SlideInAnimation(
+            delay: const Duration(milliseconds: 400),
+            offsetY: 30,
+            child: _ContinueButton(
+              onPressed: () => _handleContinue(context),
+            ),
           ),
         ],
       ),

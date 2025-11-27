@@ -58,128 +58,142 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 32),
-                  const Text(
-                    'Verify OTP Now',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF171A58),
+                  FadeInAnimation(
+                    delay: const Duration(milliseconds: 100),
+                    child: const Text(
+                      'Verify OTP Now',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF171A58),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Enter the OTP code we just sent you on your registered Email/Phone number',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF7D8CA1),
+                  FadeInAnimation(
+                    delay: const Duration(milliseconds: 200),
+                    child: const Text(
+                      'Enter the OTP code we just sent you on your registered Email/Phone number',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF7D8CA1),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(4, (index) {
-                      return Container(
-                        margin: EdgeInsets.only(right: index < 3 ? 16 : 0),
-                        width: 64,
-                        height: 64,
-                        child: TextField(
-                          controller: _otpControllers[index],
-                          focusNode: _focusNodes[index],
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF171A58),
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          decoration: InputDecoration(
-                            counterText: '',
-                            filled: true,
-                            fillColor: Colors.white,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFB08BFF),
-                                width: 1.5,
+                  SlideInAnimation(
+                    delay: const Duration(milliseconds: 300),
+                    offsetY: 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(4, (index) {
+                        return Container(
+                          margin: EdgeInsets.only(right: index < 3 ? 16 : 0),
+                          width: 64,
+                          height: 64,
+                          child: TextField(
+                            controller: _otpControllers[index],
+                            focusNode: _focusNodes[index],
+                            textAlign: TextAlign.center,
+                            keyboardType: TextInputType.number,
+                            maxLength: 1,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF171A58),
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: InputDecoration(
+                              counterText: '',
+                              filled: true,
+                              fillColor: Colors.white,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFFB08BFF),
+                                  width: 1.5,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFF532C8C),
+                                  width: 2,
+                                ),
                               ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: const BorderSide(
-                                color: Color(0xFF532C8C),
-                                width: 2,
-                              ),
-                            ),
+                            onChanged: (value) => _onOtpChanged(index, value),
                           ),
-                          onChanged: (value) => _onOtpChanged(index, value),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
                   const Spacer(),
-                  Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF532C8C), Color(0xFF171A58)],
+                  SlideInAnimation(
+                    delay: const Duration(milliseconds: 400),
+                    offsetY: 30,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF532C8C), Color(0xFF171A58)],
+                              ),
+                              borderRadius: BorderRadius.circular(28),
                             ),
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                SmoothPageRoute(
-                                  page: const EmployeeIdScreen(),
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  SmoothPageRoute(
+                                    page: const EmployeeIdScreen(),
+                                  ),
+                                );
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 18),
+                                foregroundColor: Colors.white,
+                                textStyle: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                              );
-                            },
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              foregroundColor: Colors.white,
-                              textStyle: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
                               ),
+                              child: const Text('Verify'),
                             ),
-                            child: const Text('Verify'),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF7D8CA1),
-                          ),
-                          children: [
-                            const TextSpan(
-                              text: 'Don\'t get OTP? ',
+                        const SizedBox(height: 16),
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF7D8CA1),
                             ),
-                            TextSpan(
-                              text: 'Resend OTP',
-                              style: const TextStyle(
-                                color: Color(0xFF1D4ED8),
-                                fontWeight: FontWeight.w600,
+                            children: [
+                              const TextSpan(
+                                text: 'Don\'t get OTP? ',
                               ),
-                              recognizer: TapGestureRecognizer()..onTap = () {},
-                            ),
-                          ],
+                              TextSpan(
+                                text: 'Resend OTP',
+                                style: const TextStyle(
+                                  color: Color(0xFF1D4ED8),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                recognizer: TapGestureRecognizer()..onTap = () {},
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 90),
-                    ],
+                        const SizedBox(height: 90),
+                      ],
+                    ),
                   ),
                 ],
               ),

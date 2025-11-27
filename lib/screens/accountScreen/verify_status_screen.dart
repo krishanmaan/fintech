@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/animations.dart';
 import '../mainScreen/home.dart';
 
 /// Possible states for the KYC verification summary.
@@ -76,22 +77,36 @@ class _VarifyStatiusScreenState extends State<VarifyStatiusScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "KYC Verification",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF101828),
+                        FadeInAnimation(
+                          delay: const Duration(milliseconds: 100),
+                          child: const Text(
+                            "KYC Verification",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF101828),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
                         /// Top banner summarizing the overall result.
-                        _StatusHighlightCard(theme: theme),
+                        SlideInAnimation(
+                          delay: const Duration(milliseconds: 200),
+                          offsetY: 30,
+                          child: _StatusHighlightCard(theme: theme),
+                        ),
                         const SizedBox(height: 16),
                         /// Individual checklist item states.
-                        _StatusListCard(theme: theme),
+                        SlideInAnimation(
+                          delay: const Duration(milliseconds: 300),
+                          offsetY: 30,
+                          child: _StatusListCard(theme: theme),
+                        ),
                         const Spacer(),
-                        _StatusFooter(status: widget.status),
+                        FadeInAnimation(
+                          delay: const Duration(milliseconds: 400),
+                          child: _StatusFooter(status: widget.status),
+                        ),
                       ],
                     ),
                   ),

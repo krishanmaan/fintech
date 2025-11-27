@@ -74,17 +74,31 @@ class _ContentCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Branding logo ko upar center me dikhaya gaya hai.
+          // Branding logo ko upar center me dikhaya gaya hai.
           const _HeaderLogo(),
           const SizedBox(height: 40),
           // Custom ID icon jo feel ko elevate karta hai.
-          const _IdCardIcon(),
+          const FadeInAnimation(
+            delay: Duration(milliseconds: 100),
+            child: _IdCardIcon(),
+          ),
           const SizedBox(height: 40),
-          const _KycTitle(),
+          const FadeInAnimation(
+            delay: Duration(milliseconds: 200),
+            child: _KycTitle(),
+          ),
           const SizedBox(height: 16),
-          const _KycDescription(),
+          const FadeInAnimation(
+            delay: Duration(milliseconds: 300),
+            child: _KycDescription(),
+          ),
           const Spacer(),
           // Button se Aadhaar verification step open hota hai.
-          _VerifyNowButton(),
+          const SlideInAnimation(
+            delay: Duration(milliseconds: 400),
+            offsetY: 30,
+            child: _VerifyNowButton(),
+          ),
         ],
       ),
     );
