@@ -4,6 +4,7 @@ import 'components/bottom_nav.dart';
 import '../../utils/responsive.dart';
 import 'withdraw.dart';
 import 'profile_screen.dart';
+import 'withdraw.dart';
 
 /// Main home/dashboard screen jo user ko salary aur essentials dikhata hai.
 class HomeScreen extends StatelessWidget {
@@ -26,6 +27,13 @@ class HomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          }
+          if (index == 1) {
+            // Navigate to Salary screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WithdrawScreen()),
             );
           }
           // Other tabs can be handled here
@@ -68,42 +76,56 @@ class HomeScreen extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: responsive.width(50),
-                        height: responsive.width(50),
-                        child: CircleAvatar(
-                          radius: responsive.width(50) / 2,
-                          backgroundImage: const NetworkImage(
-                            'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200',
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: responsive.width(12)),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate to Profile screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: Row(
                           children: [
-                            Text(
-                              'Welcome,',
-                              style: TextStyle(
-                                fontSize: responsive.fontSize(14),
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withValues(alpha: 0.9),
+                            SizedBox(
+                              width: responsive.width(50),
+                              height: responsive.width(50),
+                              child: CircleAvatar(
+                                radius: responsive.width(50) / 2,
+                                backgroundImage: const NetworkImage(
+                                  'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200',
+                                ),
                               ),
                             ),
-                            SizedBox(height: responsive.height(4)),
-                            Text(
-                              'Nayan mishra',
-                              style: TextStyle(
-                                fontSize: responsive.fontSize(18),
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
+                            SizedBox(width: responsive.width(12)),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Welcome,',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(14),
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                ),
+                                SizedBox(height: responsive.height(4)),
+                                Text(
+                                  'Nayan mishra',
+                                  style: TextStyle(
+                                    fontSize: responsive.fontSize(18),
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
+                      const Spacer(),
                       _ActionIcon(child: _HelpIcon(responsive: responsive)),
                       SizedBox(width: responsive.width(12)),
                       _NotificationIcon(responsive: responsive),
