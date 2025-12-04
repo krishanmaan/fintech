@@ -51,16 +51,16 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final checkPhoneResponse = await authApiService.checkPhone(phoneNumber);
 
-      print('✅ Phone check successful');
-      print('User exists: ${checkPhoneResponse.data.userExists}');
-      print('Next step: ${checkPhoneResponse.data.nextStep}');
+      debugPrint('✅ Phone check successful');
+      debugPrint('User exists: ${checkPhoneResponse.data.userExists}');
+      debugPrint('Next step: ${checkPhoneResponse.data.nextStep}');
 
       if (checkPhoneResponse.data.nextStep == 'SEND_OTP') {
         final sendOtpResponse = await authApiService.sendOtp(phoneNumber);
 
-        print('✅ OTP sent successfully');
-        print('OTP (DEV MODE): ${sendOtpResponse.data.otp}');
-        print('Expires in: ${sendOtpResponse.data.expiresIn}');
+        debugPrint('✅ OTP sent successfully');
+        debugPrint('OTP (DEV MODE): ${sendOtpResponse.data.otp}');
+        debugPrint('Expires in: ${sendOtpResponse.data.expiresIn}');
 
         await storageService.savePhoneNumber(phoneNumber);
 

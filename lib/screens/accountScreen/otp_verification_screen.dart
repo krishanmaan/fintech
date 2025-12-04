@@ -71,14 +71,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     try {
       final response = await authApiService.verifyOtp(widget.phoneNumber, otp);
 
-      print('✅ OTP verified successfully');
-      print('Access Token: ${response.data.accessToken}');
-      print('User Role: ${response.data.currentUserRole}');
-      print(
+      debugPrint('✅ OTP verified successfully');
+      debugPrint('Access Token: ${response.data.accessToken}');
+      debugPrint('User Role: ${response.data.currentUserRole}');
+      debugPrint(
         'User: ${response.data.user.firstName} ${response.data.user.lastName}',
       );
-      print('KYC Status: ${response.data.kycStatus.kycStatus}');
-      print('Can Access App: ${response.data.appAccess.canAccessApp}');
+      debugPrint('KYC Status: ${response.data.kycStatus.kycStatus}');
+      debugPrint('Can Access App: ${response.data.appAccess.canAccessApp}');
 
       await storageService.saveLoginData(response.data);
 
