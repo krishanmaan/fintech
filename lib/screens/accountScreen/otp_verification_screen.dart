@@ -2,23 +2,36 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
 import 'package:flutter/services.dart';
-
+import '../../services/auth_api_service.dart';
+import '../../services/storage_service.dart';
 import 'employee_id_screen.dart';
 
-
 class OtpVerificationScreen extends StatefulWidget {
-  const OtpVerificationScreen({super.key});
+  final String phoneNumber;
+  final String otpFromApi;
+
+  const OtpVerificationScreen({
+    super.key,
+    required this.phoneNumber,
+    required this.otpFromApi,
+  });
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+  final authApiService = AuthApiService();
+  final storageService = StorageService();
+  final List<TextEditingController> _otpControllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
 
-  final List<TextEditingController> _otpControllers =
-      List.generate(4, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -32,11 +45,118 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _onOtpChanged(int index, String value) {
-    if (value.isNotEmpty && index < 3) {
+    if (value.isNotEmpty && index < 5) {
       _focusNodes[index + 1].requestFocus();
     }
     if (value.isEmpty && index > 0) {
       _focusNodes[index - 1].requestFocus();
+    }
+  }
+
+  Future<void> _handleVerifyOtp() async {
+    final otp = _otpControllers.map((c) => c.text).join('');
+
+    if (otp.length != 6) {
+      setState(() {
+        _errorMessage = 'Please enter complete OTP';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await authApiService.verifyOtp(widget.phoneNumber, otp);
+
+      print('✅ OTP verified successfully');
+      print('Access Token: ${response.data.accessToken}');
+      print('User Role: ${response.data.currentUserRole}');
+      print(
+        'User: ${response.data.user.firstName} ${response.data.user.lastName}',
+      );
+      print('KYC Status: ${response.data.kycStatus.kycStatus}');
+      print('Can Access App: ${response.data.appAccess.canAccessApp}');
+
+      await storageService.saveLoginData(response.data);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login successful!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        SmoothPageRoute(page: const EmployeeIdScreen()),
+      );
+    } on ApiException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred';
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleResendOtp() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await authApiService.sendOtp(widget.phoneNumber);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('OTP resent successfully! (DEV: ${response.data.otp})'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -72,10 +192,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     delay: const Duration(milliseconds: 200),
                     child: const Text(
                       'Enter the OTP code we just sent you on your registered Email/Phone number',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF7D8CA1),
-                      ),
+                      style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -83,50 +200,78 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   SlideInAnimation(
                     delay: const Duration(milliseconds: 300),
                     offsetY: 30,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(4, (index) {
-                        return Container(
-                          margin: EdgeInsets.only(right: index < 3 ? 16 : 0),
-                          width: 64,
-                          height: 64,
-                          child: TextField(
-                            controller: _otpControllers[index],
-                            focusNode: _focusNodes[index],
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF171A58),
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            decoration: InputDecoration(
-                              counterText: '',
-                              filled: true,
-                              fillColor: Colors.white,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFB08BFF),
-                                  width: 1.5,
-                                ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(6, (index) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                right: index < 5 ? 12 : 0,
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFF532C8C),
-                                  width: 2,
+                              width: 48,
+                              height: 56,
+                              child: TextField(
+                                controller: _otpControllers[index],
+                                focusNode: _focusNodes[index],
+                                enabled: !_isLoading,
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                maxLength: 1,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF171A58),
                                 ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                decoration: InputDecoration(
+                                  counterText: '',
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFB08BFF),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFF532C8C),
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                                onChanged: (value) =>
+                                    _onOtpChanged(index, value),
+                              ),
+                            );
+                          }),
+                        ),
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
                               ),
                             ),
-                            onChanged: (value) => _onOtpChanged(index, value),
                           ),
-                        );
-                      }),
+                        const SizedBox(height: 12),
+                        Text(
+                          'DEV MODE: OTP is ${widget.otpFromApi}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const Spacer(),
@@ -145,23 +290,27 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               borderRadius: BorderRadius.circular(28),
                             ),
                             child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  SmoothPageRoute(
-                                    page: const EmployeeIdScreen(),
-                                  ),
-                                );
-                              },
+                              onPressed: _isLoading ? null : _handleVerifyOtp,
                               style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 18),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                ),
                                 foregroundColor: Colors.white,
                                 textStyle: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              child: const Text('Verify'),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text('Verify'),
                             ),
                           ),
                         ),
@@ -174,16 +323,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               color: Color(0xFF7D8CA1),
                             ),
                             children: [
-                              const TextSpan(
-                                text: 'Don\'t get OTP? ',
-                              ),
+                              const TextSpan(text: 'Don\'t get OTP? '),
                               TextSpan(
                                 text: 'Resend OTP',
                                 style: const TextStyle(
                                   color: Color(0xFF1D4ED8),
                                   fontWeight: FontWeight.w600,
                                 ),
-                                recognizer: TapGestureRecognizer()..onTap = () {},
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = _handleResendOtp,
                               ),
                             ],
                           ),
@@ -222,11 +370,11 @@ class _OtpHeader extends StatelessWidget {
           ),
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(top:10),
+              padding: const EdgeInsets.only(top: 10),
               child: Image.asset(
                 'assets/logo/logo-light.png',
                 width: 220,
-                
+
                 fit: BoxFit.contain,
                 color: Colors.white,
                 colorBlendMode: BlendMode.srcIn,
@@ -377,4 +525,3 @@ class _OtpWavePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

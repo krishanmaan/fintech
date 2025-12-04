@@ -1,8 +1,9 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
+import '../../services/auth_api_service.dart';
+import '../../services/storage_service.dart';
 import 'otp_verification_screen.dart';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,9 +13,110 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
-
+  final TextEditingController _phoneController = TextEditingController();
+  final authApiService = AuthApiService();
+  final storageService = StorageService();
   bool _rememberMe = false;
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final phoneNumber = _phoneController.text.trim();
+
+    if (phoneNumber.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter your phone number';
+      });
+      return;
+    }
+
+    if (phoneNumber.length != 10) {
+      setState(() {
+        _errorMessage = 'Please enter a valid 10-digit phone number';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final checkPhoneResponse = await authApiService.checkPhone(phoneNumber);
+
+      print('✅ Phone check successful');
+      print('User exists: ${checkPhoneResponse.data.userExists}');
+      print('Next step: ${checkPhoneResponse.data.nextStep}');
+
+      if (checkPhoneResponse.data.nextStep == 'SEND_OTP') {
+        final sendOtpResponse = await authApiService.sendOtp(phoneNumber);
+
+        print('✅ OTP sent successfully');
+        print('OTP (DEV MODE): ${sendOtpResponse.data.otp}');
+        print('Expires in: ${sendOtpResponse.data.expiresIn}');
+
+        await storageService.savePhoneNumber(phoneNumber);
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'OTP sent successfully! (DEV: ${sendOtpResponse.data.otp})',
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+
+        Navigator.push(
+          context,
+          SmoothPageRoute(
+            page: OtpVerificationScreen(
+              phoneNumber: phoneNumber,
+              otpFromApi: sendOtpResponse.data.otp,
+            ),
+          ),
+        );
+      }
+    } on ApiException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred';
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,9 +175,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 8),
                         TextField(
+                          controller: _phoneController,
                           keyboardType: TextInputType.phone,
+                          maxLength: 10,
+                          enabled: !_isLoading,
                           decoration: InputDecoration(
                             hintText: '9876543210',
+                            counterText: '',
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 18,
@@ -84,8 +190,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             fillColor: Colors.white,
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(28),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE2E8F0),
+                              borderSide: BorderSide(
+                                color: _errorMessage != null
+                                    ? Colors.red
+                                    : const Color(0xFFE2E8F0),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -97,6 +205,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, left: 4),
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                         const SizedBox(height: 6),
                         Row(
                           children: [
@@ -136,14 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(28),
                         ),
                         child: TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              SmoothPageRoute(
-                                page: const OtpVerificationScreen(),
-                              ),
-                            );
-                          },
+                          onPressed: _isLoading ? null : _handleLogin,
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             foregroundColor: Colors.white,
@@ -152,7 +264,16 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          child: const Text('Log In'),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Log In'),
                         ),
                       ),
                     ),

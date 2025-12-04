@@ -4,7 +4,6 @@ import 'components/bottom_nav.dart';
 import '../../utils/responsive.dart';
 import 'withdraw.dart';
 import 'profile_screen.dart';
-import 'withdraw.dart';
 
 /// Main home/dashboard screen jo user ko salary aur essentials dikhata hai.
 class HomeScreen extends StatelessWidget {
