@@ -2,12 +2,70 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'components/bottom_nav.dart';
 import '../../utils/responsive.dart';
+import '../../services/storage_service.dart';
 import 'withdraw.dart';
 import 'profile_screen.dart';
 
 /// Main home/dashboard screen jo user ko salary aur essentials dikhata hai.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final StorageService _storageService = StorageService();
+  String _userName = 'User';
+  String _phoneNumber = '';
+  double _salary = 0.0;
+  String _kycStatus = 'NOT_STARTED';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await _storageService.getUserData();
+      final employeeData = await _storageService.getEmployeeData();
+      final kycStatus = await _storageService.getKycStatus();
+      final phoneNumber = await _storageService.getPhoneNumber();
+
+      if (mounted) {
+        setState(() {
+          if (userData != null) {
+            _userName =
+                '${userData['first_name'] ?? ''} ${userData['last_name'] ?? ''}'
+                    .trim();
+            if (_userName.isEmpty) _userName = 'User';
+          }
+
+          if (phoneNumber != null) {
+            _phoneNumber = phoneNumber;
+          }
+
+          if (employeeData != null) {
+            _salary = (employeeData['salary'] ?? 0).toDouble();
+          }
+
+          if (kycStatus != null) {
+            _kycStatus = kycStatus['kyc_status'] ?? 'NOT_STARTED';
+          }
+
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +170,7 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 SizedBox(height: responsive.height(4)),
                                 Text(
-                                  'Nayan mishra',
+                                  _isLoading ? 'Loading...' : _userName,
                                   style: TextStyle(
                                     fontSize: responsive.fontSize(18),
                                     fontWeight: FontWeight.w700,
@@ -145,7 +203,11 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Monthly Salary Card
-                        _SummaryCard(responsive: responsive),
+                        _SummaryCard(
+                          responsive: responsive,
+                          salary: _salary,
+                          kycStatus: _kycStatus,
+                        ),
                         SizedBox(height: responsive.height(20)),
                         // Promotional banner slider
                         _PromoBannerSlider(responsive: responsive),
@@ -276,9 +338,15 @@ const String _notificationIconSvg = '''
 ''';
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({required this.responsive});
+  const _SummaryCard({
+    required this.responsive,
+    required this.salary,
+    required this.kycStatus,
+  });
 
   final Responsive responsive;
+  final double salary;
+  final String kycStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +404,7 @@ class _SummaryCard extends StatelessWidget {
             Positioned(
               top: responsive.height(18),
               left: responsive.width(18),
-              child: _SalaryComponent(responsive: responsive),
+              child: _SalaryComponent(responsive: responsive, salary: salary),
             ),
             // Wallet icon
             Positioned(
@@ -370,9 +438,10 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _SalaryComponent extends StatelessWidget {
-  const _SalaryComponent({required this.responsive});
+  const _SalaryComponent({required this.responsive, required this.salary});
 
   final Responsive responsive;
+  final double salary;
 
   @override
   Widget build(BuildContext context) {
@@ -404,7 +473,7 @@ class _SalaryComponent extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    '₹ 5,600.00',
+                    '₹ ${salary.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: responsive.fontSize(24),
                       fontWeight: FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../utils/animations.dart';
+import '../../services/storage_service.dart';
 import 'faqs_screen.dart';
 import 'transaction_history_screen.dart';
 
@@ -13,6 +14,51 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final StorageService _storageService = StorageService();
+  String _userName = '';
+  String _phoneNumber = '';
+  String _kycStatus = 'NOT_STARTED';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await _storageService.getUserData();
+      final phoneNumber = await _storageService.getPhoneNumber();
+      final kycStatus = await _storageService.getKycStatus();
+
+      if (mounted) {
+        setState(() {
+          if (userData != null) {
+            _userName =
+                '${userData['first_name'] ?? ''} ${userData['last_name'] ?? ''}'
+                    .trim();
+          }
+
+          if (phoneNumber != null) {
+            _phoneNumber = phoneNumber;
+          }
+
+          if (kycStatus != null) {
+            _kycStatus = kycStatus['kyc_status'] ?? 'NOT_STARTED';
+          }
+
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading user data: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -195,9 +241,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 12),
 
           // User name
-          const Text(
-            'Aayush Tewari',
-            style: TextStyle(
+          Text(
+            _isLoading
+                ? 'Loading...'
+                : _userName.isEmpty
+                ? 'User'
+                : _userName,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Color(0xFF101828),
@@ -207,27 +257,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 4),
 
           // Phone number
-          const Text(
-            '+91 8855661155',
-            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+          Text(
+            _isLoading
+                ? 'Loading...'
+                : _phoneNumber.isEmpty
+                ? 'No phone'
+                : _phoneNumber,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
           ),
 
           const SizedBox(height: 16),
 
           // KYC button
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF482983),
+              color: _kycStatus == 'VERIFIED'
+                  ? const Color(0xFF10B981)
+                  : const Color(0xFF482983),
               borderRadius: BorderRadius.circular(18),
             ),
-            child: const Text(
-              'KYC',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (_kycStatus == 'VERIFIED')
+                  const Padding(
+                    padding: EdgeInsets.only(right: 6),
+                    child: Icon(
+                      Icons.check_circle,
+                      size: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                Text(
+                  _kycStatus == 'VERIFIED' ? 'KYC Verified' : 'KYC Pending',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
 

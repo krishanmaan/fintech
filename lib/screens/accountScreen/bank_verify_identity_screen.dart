@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
+import '../../services/kyc_api_service.dart';
+import '../../services/storage_service.dart';
 import 'verify_status_screen.dart';
-
 
 class BankVerifyIdentityScreen extends StatefulWidget {
   const BankVerifyIdentityScreen({super.key});
@@ -18,6 +19,7 @@ class _BankVerifyIdentityScreenState extends State<BankVerifyIdentityScreen> {
   final TextEditingController _branchController = TextEditingController();
   final TextEditingController _cardController = TextEditingController();
   final TextEditingController _cvvController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -27,6 +29,75 @@ class _BankVerifyIdentityScreenState extends State<BankVerifyIdentityScreen> {
     _cardController.dispose();
     _cvvController.dispose();
     super.dispose();
+  }
+
+  Future<void> _verifyBank() async {
+    if (_accountController.text.trim().isEmpty) {
+      _showError('Please enter account number');
+      return;
+    }
+
+    if (_ifscController.text.trim().isEmpty) {
+      _showError('Please enter IFSC code');
+      return;
+    }
+
+    if (_branchController.text.trim().isEmpty) {
+      _showError('Please enter branch name');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final storageService = StorageService();
+      final token = await storageService.getAccessToken();
+
+      if (token == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final kycService = KycApiService(authToken: token);
+      final response = await kycService.verifyBank(
+        accountHolderName: 'User Name',
+        accountNumber: _accountController.text.trim(),
+        ifscCode: _ifscController.text.trim(),
+        bankName: 'Bank Name',
+        branchName: _branchController.text.trim(),
+        accountType: 'SAVINGS',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const VarifyStatiusScreen(status: KycStatus.completed),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      _showError('Error: ${e.toString()}');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 
   @override
@@ -49,6 +120,8 @@ class _BankVerifyIdentityScreenState extends State<BankVerifyIdentityScreen> {
                     branchController: _branchController,
                     cardController: _cardController,
                     cvvController: _cvvController,
+                    onVerify: _verifyBank,
+                    isLoading: _isLoading,
                   ),
                 ),
               ],
@@ -69,9 +142,7 @@ class _BankGradientBackground extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: CustomPaint(
-        painter: _BankWavePainter(headerHeight: headerHeight),
-      ),
+      child: CustomPaint(painter: _BankWavePainter(headerHeight: headerHeight)),
     );
   }
 }
@@ -82,6 +153,8 @@ class _BankContentCard extends StatelessWidget {
   final TextEditingController branchController;
   final TextEditingController cardController;
   final TextEditingController cvvController;
+  final VoidCallback onVerify;
+  final bool isLoading;
 
   const _BankContentCard({
     required this.accountController,
@@ -89,6 +162,8 @@ class _BankContentCard extends StatelessWidget {
     required this.branchController,
     required this.cardController,
     required this.cvvController,
+    required this.onVerify,
+    required this.isLoading,
   });
 
   @override
@@ -130,10 +205,7 @@ class _BankContentCard extends StatelessWidget {
               delay: const Duration(milliseconds: 200),
               child: const Text(
                 "Please provide you bank details",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF7D8CA1),
-                ),
+                style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
               ),
             ),
             const SizedBox(height: 28),
@@ -157,42 +229,42 @@ class _BankContentCard extends StatelessWidget {
                     hint: "Add account number",
                   ),
                   const SizedBox(height: 20),
-                  const _FieldLabel("IFC Code"),
+                  const _FieldLabel("IFSC Code"),
                   const SizedBox(height: 8),
                   _FormInputField(
                     controller: ifscController,
-                    hint: "Add ifc code",
+                    hint: "Add IFSC code",
                   ),
                   const SizedBox(height: 20),
                   const _FieldLabel("Branch"),
                   const SizedBox(height: 8),
                   _FormInputField(
                     controller: branchController,
-                    hint: "write branch",
+                    hint: "Write branch",
                   ),
                   const SizedBox(height: 20),
-                  const _FieldLabel("Card Number"),
+                  const _FieldLabel("Card Number (Optional)"),
                   const SizedBox(height: 8),
                   _FormInputField(
                     controller: cardController,
                     hint: "Card Number",
                   ),
                   const SizedBox(height: 20),
-                  const _FieldLabel("Cvv"),
+                  const _FieldLabel("CVV (Optional)"),
                   const SizedBox(height: 8),
                   _CvvInputField(
                     controller: cvvController,
-                    hint: "Add cvv number",
+                    hint: "Add CVV number",
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 32),
 
-            const SlideInAnimation(
-              delay: Duration(milliseconds: 500),
+            SlideInAnimation(
+              delay: const Duration(milliseconds: 500),
               offsetY: 30,
-              child: _VerifyButton(),
+              child: _VerifyButton(onPressed: onVerify, isLoading: isLoading),
             ),
           ],
         ),
@@ -222,10 +294,7 @@ class _FormInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
 
-  const _FormInputField({
-    required this.controller,
-    required this.hint,
-  });
+  const _FormInputField({required this.controller, required this.hint});
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +304,10 @@ class _FormInputField extends StatelessWidget {
         filled: true,
         fillColor: const Color(0xFFF5F6FA),
         hintText: hint,
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -249,10 +321,7 @@ class _CvvInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
 
-  const _CvvInputField({
-    required this.controller,
-    required this.hint,
-  });
+  const _CvvInputField({required this.controller, required this.hint});
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +339,10 @@ class _CvvInputField extends StatelessWidget {
             color: Color(0xFF5B2B8F),
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -301,26 +373,19 @@ class _BankProviderTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SvgPicture.string(
-            _bankSvgIcon,
-            width: 48,
-            height: 48,
-          ),
+          SvgPicture.string(_bankSvgIcon, width: 48, height: 48),
           const SizedBox(width: 16),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "State Bank Of India 6200",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF7D8CA1),
-                  ),
+                  "Select Bank",
+                  style: TextStyle(fontSize: 12, color: Color(0xFF7D8CA1)),
                 ),
                 SizedBox(height: 4),
                 Text(
-                  "Vikash shing",
+                  "Bank Account",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -341,7 +406,10 @@ class _BankProviderTile extends StatelessWidget {
 }
 
 class _VerifyButton extends StatelessWidget {
-  const _VerifyButton();
+  final VoidCallback onPressed;
+  final bool isLoading;
+
+  const _VerifyButton({required this.onPressed, required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
@@ -357,15 +425,7 @@ class _VerifyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    const VarifyStatiusScreen(status: KycStatus.completed),
-              ),
-            );
-          },
+          onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,
@@ -374,7 +434,16 @@ class _VerifyButton extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          child: const Text("Verify Now"),
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text("Verify Now"),
         ),
       ),
     );
@@ -416,7 +485,6 @@ class _StepItem extends StatelessWidget {
 
     Color backgroundColor;
     Color textColor;
-
 
     if (isCurrent) {
       backgroundColor = const Color(0xFFEDEBFF);
@@ -525,4 +593,3 @@ const String _bankSvgIcon = '''
 </defs>
 </svg>
 ''';
-

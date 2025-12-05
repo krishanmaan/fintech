@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
+import '../../services/kyc_api_service.dart';
+import '../../services/storage_service.dart';
 import 'pan_verify_identity_screen.dart';
-
 
 class AadhaarVerifyIdentityScreen extends StatefulWidget {
   const AadhaarVerifyIdentityScreen({super.key});
@@ -15,6 +16,65 @@ class AadhaarVerifyIdentityScreen extends StatefulWidget {
 class _AadhaarVerifyIdentityScreenState
     extends State<AadhaarVerifyIdentityScreen> {
   final TextEditingController _aadhaarController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _verifyAadhaar() async {
+    if (_aadhaarController.text.trim().length != 12) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid 12-digit Aadhaar number'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final storageService = StorageService();
+      final token = await storageService.getAccessToken();
+
+      if (token == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final kycService = KycApiService(authToken: token);
+      final response = await kycService.verifyAadhaar(
+        aadhaarNumber: _aadhaarController.text.trim(),
+        aadhaarName: 'User Name',
+        dateOfBirth: '1990-01-01',
+        address: 'User Address',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const PanVerifyIdentityScreen()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +94,8 @@ class _AadhaarVerifyIdentityScreenState
                 Expanded(
                   child: _AadhaarContentCard(
                     aadhaarController: _aadhaarController,
+                    onVerify: _verifyAadhaar,
+                    isLoading: _isLoading,
                   ),
                 ),
               ],
@@ -44,7 +106,6 @@ class _AadhaarVerifyIdentityScreenState
     );
   }
 }
-
 
 class _AadhaarGradientBackground extends StatelessWidget {
   const _AadhaarGradientBackground();
@@ -63,11 +124,16 @@ class _AadhaarGradientBackground extends StatelessWidget {
   }
 }
 
-
 class _AadhaarContentCard extends StatelessWidget {
   final TextEditingController aadhaarController;
+  final VoidCallback onVerify;
+  final bool isLoading;
 
-  const _AadhaarContentCard({required this.aadhaarController});
+  const _AadhaarContentCard({
+    required this.aadhaarController,
+    required this.onVerify,
+    required this.isLoading,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +181,6 @@ class _AadhaarContentCard extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-
           const SlideInAnimation(
             delay: Duration(milliseconds: 300),
             offsetY: 30,
@@ -151,18 +216,16 @@ class _AadhaarContentCard extends StatelessWidget {
 
           const Spacer(),
 
-
-          const SlideInAnimation(
-            delay: Duration(milliseconds: 500),
+          SlideInAnimation(
+            delay: const Duration(milliseconds: 500),
             offsetY: 30,
-            child: _VerifyButton(),
+            child: _VerifyButton(onPressed: onVerify, isLoading: isLoading),
           ),
         ],
       ),
     );
   }
 }
-
 
 class _AadhaarInputField extends StatelessWidget {
   final TextEditingController controller;
@@ -196,7 +259,6 @@ class _AadhaarInputField extends StatelessWidget {
     );
   }
 }
-
 
 class _StepHeader extends StatelessWidget {
   const _StepHeader();
@@ -236,7 +298,6 @@ class _StepItem extends StatelessWidget {
 
     Color backgroundColor;
     Color textColor;
-
 
     if (isCurrent) {
       backgroundColor = const Color(0xFFEDEBFF);
@@ -292,9 +353,11 @@ class _StepConnector extends StatelessWidget {
   }
 }
 
-
 class _VerifyButton extends StatelessWidget {
-  const _VerifyButton();
+  final VoidCallback onPressed;
+  final bool isLoading;
+
+  const _VerifyButton({required this.onPressed, required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
@@ -310,14 +373,7 @@ class _VerifyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const PanVerifyIdentityScreen(),
-              ),
-            );
-          },
+          onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,
@@ -326,7 +382,16 @@ class _VerifyButton extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          child: const Text("Verify Now"),
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text("Verify Now"),
         ),
       ),
     );
@@ -400,7 +465,6 @@ const String _aadhaarSvgIcon = '''
 </defs>
 </svg>
 ''';
-
 
 class _AadhaarWavePainter extends CustomPainter {
   final double headerHeight;

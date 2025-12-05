@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
+import '../../services/kyc_api_service.dart';
+import '../../services/storage_service.dart';
 import 'bank_verify_identity_screen.dart';
-
 
 class PanVerifyIdentityScreen extends StatefulWidget {
   const PanVerifyIdentityScreen({super.key});
@@ -15,6 +16,7 @@ class PanVerifyIdentityScreen extends StatefulWidget {
 class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
   final TextEditingController _panController = TextEditingController();
   DateTime? _selectedDate;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -22,10 +24,80 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
     super.dispose();
   }
 
+  Future<void> _verifyPan() async {
+    if (_panController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter PAN number'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select date of birth'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final storageService = StorageService();
+      final token = await storageService.getAccessToken();
+
+      if (token == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final kycService = KycApiService(authToken: token);
+      final response = await kycService.verifyPan(
+        panNumber: _panController.text.trim(),
+        panName: 'User Name',
+        dateOfBirth: _formatDateForApi(_selectedDate!),
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(response.message),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const BankVerifyIdentityScreen()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  String _formatDateForApi(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
   Future<void> _openDatePicker() async {
     DateTime tempSelected = _selectedDate ?? DateTime(2002, 5, 7);
-    DateTime visibleMonth =
-        DateTime(tempSelected.year, tempSelected.month, 1);
+    DateTime visibleMonth = DateTime(tempSelected.year, tempSelected.month, 1);
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -38,44 +110,52 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
           builder: (context, setModalState) {
             void changeMonth(int delta) {
               setModalState(() {
-                visibleMonth =
-                    DateTime(visibleMonth.year, visibleMonth.month + delta, 1);
+                visibleMonth = DateTime(
+                  visibleMonth.year,
+                  visibleMonth.month + delta,
+                  1,
+                );
               });
             }
-
 
             List<Widget> buildCalendarDays() {
               final List<Widget> rows = [];
               const List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-              rows.add(Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: weekDays
-                    .map(
-                      (day) => Expanded(
-                        child: Center(
-                          child: Text(
-                            day,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF98A2B3),
-                              fontWeight: FontWeight.w600,
+              rows.add(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: weekDays
+                      .map(
+                        (day) => Expanded(
+                          child: Center(
+                            child: Text(
+                              day,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF98A2B3),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
-              ));
+                      )
+                      .toList(),
+                ),
+              );
               rows.add(const SizedBox(height: 12));
 
-              final DateTime firstDay =
-                  DateTime(visibleMonth.year, visibleMonth.month, 1);
-              final int totalDays =
-                  DateUtils.getDaysInMonth(visibleMonth.year, visibleMonth.month);
+              final DateTime firstDay = DateTime(
+                visibleMonth.year,
+                visibleMonth.month,
+                1,
+              );
+              final int totalDays = DateUtils.getDaysInMonth(
+                visibleMonth.year,
+                visibleMonth.month,
+              );
               final int offset = firstDay.weekday % 7;
-              final int totalCells =
-                  (offset + totalDays) <= 35 ? 35 : 42;
+              final int totalCells = (offset + totalDays) <= 35 ? 35 : 42;
 
               List<Widget> dayCells = [];
               for (int index = 0; index < totalCells; index++) {
@@ -85,9 +165,13 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                   continue;
                 }
 
-                final DateTime currentDay =
-                    DateTime(visibleMonth.year, visibleMonth.month, dayNumber);
-                final bool isSelected = tempSelected.year == currentDay.year &&
+                final DateTime currentDay = DateTime(
+                  visibleMonth.year,
+                  visibleMonth.month,
+                  dayNumber,
+                );
+                final bool isSelected =
+                    tempSelected.year == currentDay.year &&
                     tempSelected.month == currentDay.month &&
                     tempSelected.day == currentDay.day;
 
@@ -113,8 +197,9 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                           color: isSelected
                               ? Colors.white
                               : const Color(0xFF1D1E25),
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -275,6 +360,8 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                     panController: _panController,
                     onPickDate: _openDatePicker,
                     dateLabel: _dateLabel,
+                    onVerify: _verifyPan,
+                    isLoading: _isLoading,
                   ),
                 ),
               ],
@@ -295,9 +382,7 @@ class _PanGradientBackground extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: CustomPaint(
-        painter: _PanWavePainter(headerHeight: headerHeight),
-      ),
+      child: CustomPaint(painter: _PanWavePainter(headerHeight: headerHeight)),
     );
   }
 }
@@ -306,11 +391,15 @@ class _PanContentCard extends StatelessWidget {
   final TextEditingController panController;
   final VoidCallback onPickDate;
   final String dateLabel;
+  final VoidCallback onVerify;
+  final bool isLoading;
 
   const _PanContentCard({
     required this.panController,
     required this.onPickDate,
     required this.dateLabel,
+    required this.onVerify,
+    required this.isLoading,
   });
 
   @override
@@ -350,11 +439,8 @@ class _PanContentCard extends StatelessWidget {
           FadeInAnimation(
             delay: const Duration(milliseconds: 200),
             child: const Text(
-              "Please provide you aadhar details",
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF7D8CA1),
-              ),
+              "Please provide you PAN details",
+              style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
             ),
           ),
           const SizedBox(height: 28),
@@ -394,19 +480,16 @@ class _PanContentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _DateInputField(
-                  label: dateLabel,
-                  onTap: onPickDate,
-                ),
+                _DateInputField(label: dateLabel, onTap: onPickDate),
               ],
             ),
           ),
           const Spacer(),
 
-          const SlideInAnimation(
-            delay: Duration(milliseconds: 500),
+          SlideInAnimation(
+            delay: const Duration(milliseconds: 500),
             offsetY: 30,
-            child: _VerifyButton(),
+            child: _VerifyButton(onPressed: onVerify, isLoading: isLoading),
           ),
         ],
       ),
@@ -418,10 +501,7 @@ class _PanInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
 
-  const _PanInputField({
-    required this.controller,
-    required this.hint,
-  });
+  const _PanInputField({required this.controller, required this.hint});
 
   @override
   Widget build(BuildContext context) {
@@ -431,7 +511,10 @@ class _PanInputField extends StatelessWidget {
         filled: true,
         fillColor: const Color(0xFFF5F6FA),
         hintText: hint,
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -445,10 +528,7 @@ class _DateInputField extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _DateInputField({
-    required this.label,
-    required this.onTap,
-  });
+  const _DateInputField({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -473,10 +553,7 @@ class _DateInputField extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(
-              Icons.calendar_today_rounded,
-              color: Color(0xFF5B2B8F),
-            ),
+            const Icon(Icons.calendar_today_rounded, color: Color(0xFF5B2B8F)),
           ],
         ),
       ),
@@ -505,11 +582,7 @@ class _VerificationProviderTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SvgPicture.string(
-            _panSvgIcon,
-            width: 42,
-            height: 32,
-          ),
+          SvgPicture.string(_panSvgIcon, width: 42, height: 32),
           const SizedBox(width: 16),
           const Expanded(
             child: Column(
@@ -517,10 +590,7 @@ class _VerificationProviderTile extends StatelessWidget {
               children: [
                 Text(
                   "Protean",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF7D8CA1),
-                  ),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF7D8CA1)),
                 ),
                 SizedBox(height: 4),
                 Text(
@@ -545,7 +615,10 @@ class _VerificationProviderTile extends StatelessWidget {
 }
 
 class _VerifyButton extends StatelessWidget {
-  const _VerifyButton();
+  final VoidCallback onPressed;
+  final bool isLoading;
+
+  const _VerifyButton({required this.onPressed, required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
@@ -561,14 +634,7 @@ class _VerifyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const BankVerifyIdentityScreen(),
-              ),
-            );
-          },
+          onPressed: isLoading ? null : onPressed,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,
@@ -577,7 +643,16 @@ class _VerifyButton extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          child: const Text("Verify Now"),
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : const Text("Verify Now"),
         ),
       ),
     );
@@ -619,7 +694,6 @@ class _StepItem extends StatelessWidget {
 
     Color backgroundColor;
     Color textColor;
-
 
     if (isCurrent) {
       backgroundColor = const Color(0xFFEDEBFF);
@@ -719,10 +793,7 @@ class _DateNavButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _DateNavButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _DateNavButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -734,11 +805,7 @@ class _DateNavButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: const Color(0xFFE4E7EC)),
         ),
-        child: Icon(
-          icon,
-          size: 16,
-          color: const Color(0xFF101828),
-        ),
+        child: Icon(icon, size: 16, color: const Color(0xFF101828)),
       ),
     );
   }
@@ -749,4 +816,3 @@ const String _panSvgIcon = '''
 <path d="M39.687 0H2.313C1.038 0 0 1.03725 0 2.313V29.652C0 30.9278 1.038 31.965 2.313 31.965H39.687C40.962 31.965 42 30.9278 42 29.652V2.313C42 1.03725 40.962 0 39.687 0ZM20.7225 24.213C20.7225 24.627 20.3873 24.963 19.9733 24.963L4.14375 24.9735C3.94425 24.9735 3.75375 24.8948 3.6135 24.7545C3.4725 24.6135 3.39375 24.423 3.39375 24.2235V21.864C3.39375 18.561 5.71875 15.7958 8.81475 15.1133C7.962 14.274 7.43175 13.1078 7.43175 11.82C7.43175 9.27 9.507 7.19475 12.057 7.19475C14.607 7.19475 16.6815 9.26925 16.6815 11.82C16.6815 13.1085 16.1505 14.2748 15.2977 15.114C18.3967 15.798 20.724 18.5625 20.724 21.864V24.213H20.7225ZM36.9202 24.3953H24.0285C23.6137 24.3953 23.2785 24.0592 23.2785 23.6453C23.2785 23.2313 23.6137 22.8953 24.0285 22.8953H36.9202C37.335 22.8953 37.6702 23.2313 37.6702 23.6453C37.6702 24.0592 37.335 24.3953 36.9202 24.3953ZM36.9202 19.095H24.0285C23.6137 19.095 23.2785 18.759 23.2785 18.345C23.2785 17.931 23.6137 17.595 24.0285 17.595H36.9202C37.335 17.595 37.6702 17.931 37.6702 18.345C37.6702 18.759 37.335 19.095 36.9202 19.095ZM36.9202 13.7948H24.0285C23.6137 13.7948 23.2785 13.4588 23.2785 13.0448C23.2785 12.6308 23.6137 12.2948 24.0285 12.2948H36.9202C37.335 12.2948 37.6702 12.6308 37.6702 13.0448C37.6702 13.4588 37.335 13.7948 36.9202 13.7948ZM36.9225 8.4915H24.03C23.6153 8.4915 23.28 8.1555 23.28 7.7415C23.28 7.3275 23.6153 6.9915 24.03 6.9915H36.9225C37.3372 6.9915 37.6725 7.3275 37.6725 7.7415C37.6725 8.1555 37.3372 8.4915 36.9225 8.4915Z" fill="#B4BFD2"/>
 </svg>
 ''';
-
