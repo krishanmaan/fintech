@@ -34,17 +34,29 @@ class _AadhaarVerifyIdentityScreenState
     try {
       final storageService = StorageService();
       final token = await storageService.getAccessToken();
+      final userData = await storageService.getUserData();
 
       if (token == null) {
         throw Exception('Not authenticated');
       }
 
+      // Get user name from stored data
+      String userName = 'User Name';
+      if (userData != null) {
+        userName =
+            '${userData['first_name'] ?? ''} ${userData['last_name'] ?? ''}'
+                .trim();
+        if (userName.isEmpty) userName = 'User Name';
+      }
+
       final kycService = KycApiService(authToken: token);
       final response = await kycService.verifyAadhaar(
         aadhaarNumber: _aadhaarController.text.trim(),
-        aadhaarName: 'User Name',
-        dateOfBirth: '1990-01-01',
-        address: 'User Address',
+        aadhaarName: userName,
+        dateOfBirth:
+            '1990-01-01', // Default DOB, actual verification from backend
+        address:
+            'User Address', // Default address, actual verification from backend
       );
 
       if (!mounted) return;
@@ -145,7 +157,7 @@ class _AadhaarContentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF171A58).withValues(alpha: 0.08),
+            color: const Color(0xFF171A58).withOpacity(0.08),
             blurRadius: 24,
             offset: const Offset(0, 14),
           ),
@@ -174,7 +186,7 @@ class _AadhaarContentCard extends StatelessWidget {
           FadeInAnimation(
             delay: const Duration(milliseconds: 200),
             child: const Text(
-              "Please provide you aadhaar details",
+              "Please provide your aadhaar details",
               style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
             ),
           ),
@@ -411,7 +423,7 @@ class _VerificationProviderTile extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE4E7EC)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF101828).withValues(alpha: 0.05),
+            color: const Color(0xFF101828).withOpacity(0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
