@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     } catch (e) {
-      print('Error loading user data: $e');
+      debugPrint('Error loading user data: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -494,14 +494,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String selectedLanguage,
     ValueChanged<String?> onChanged,
   ) {
+    final isSelected = language == selectedLanguage;
     return ListTile(
       title: Text(language),
-      leading: Radio<String>(
-        value: language,
-        groupValue: selectedLanguage,
-        activeColor: const Color(0xFF482983),
-        onChanged: onChanged,
+      leading: GestureDetector(
+        onTap: () => onChanged(language),
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected ? const Color(0xFF482983) : Colors.grey,
+              width: 2,
+            ),
+          ),
+          child: isSelected
+              ? Center(
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF482983),
+                    ),
+                  ),
+                )
+              : null,
+        ),
       ),
+      onTap: () => onChanged(language),
     );
   }
 

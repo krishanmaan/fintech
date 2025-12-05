@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final StorageService _storageService = StorageService();
   String _userName = 'User';
-  String _phoneNumber = '';
   double _salary = 0.0;
   String _kycStatus = 'NOT_STARTED';
   bool _isLoading = true;
@@ -33,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final userData = await _storageService.getUserData();
       final employeeData = await _storageService.getEmployeeData();
       final kycStatus = await _storageService.getKycStatus();
-      final phoneNumber = await _storageService.getPhoneNumber();
 
       if (mounted) {
         setState(() {
@@ -42,10 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 '${userData['first_name'] ?? ''} ${userData['last_name'] ?? ''}'
                     .trim();
             if (_userName.isEmpty) _userName = 'User';
-          }
-
-          if (phoneNumber != null) {
-            _phoneNumber = phoneNumber;
           }
 
           if (employeeData != null) {
@@ -60,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print('Error loading user data: $e');
+      debugPrint('Error loading user data: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }
