@@ -209,8 +209,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               margin: EdgeInsets.only(
                                 right: index < 5 ? 12 : 0,
                               ),
-                              width: 48,
-                              height: 56,
+                              width: 52,
+                              height: 60,
                               child: TextField(
                                 controller: _otpControllers[index],
                                 focusNode: _focusNodes[index],
@@ -219,9 +219,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 keyboardType: TextInputType.number,
                                 maxLength: 1,
                                 style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
                                   color: Color(0xFF171A58),
+                                  height: 1.2,
                                 ),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
@@ -230,18 +231,29 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   counterText: '',
                                   filled: true,
                                   fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 0,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFB08BFF),
-                                      width: 1.5,
+                                      color: Color(0xFF5F2E97),
+                                      width: 2,
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFF532C8C),
-                                      width: 2,
+                                      color: Color(0xFF5F2E97),
+                                      width: 2.5,
+                                    ),
+                                  ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Color(0xFFB08BFF).withOpacity(0.5),
+                                      width: 1.5,
                                     ),
                                   ),
                                 ),

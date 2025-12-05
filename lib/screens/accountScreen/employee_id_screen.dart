@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
 import 'verify_identity_screen.dart';
 
-
 class EmployeeIdScreen extends StatefulWidget {
   const EmployeeIdScreen({super.key});
 
@@ -11,17 +10,18 @@ class EmployeeIdScreen extends StatefulWidget {
 }
 
 class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
+  final TextEditingController _businessNameController = TextEditingController(
+    text: '',
+  );
 
-  final TextEditingController _businessNameController =
-      TextEditingController(text: 'Nests India (nests)');
+  final TextEditingController _employeeIdController = TextEditingController();
 
-
-  final TextEditingController _businessCodeController =
-      TextEditingController();
+  final TextEditingController _businessCodeController = TextEditingController();
 
   @override
   void dispose() {
     _businessNameController.dispose();
+    _employeeIdController.dispose();
     _businessCodeController.dispose();
     super.dispose();
   }
@@ -41,10 +41,10 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
               children: [
                 const SizedBox(height: 20),
 
-
                 Expanded(
                   child: _EmployeeContentCard(
                     businessNameController: _businessNameController,
+                    employeeIdController: _employeeIdController,
                     businessCodeController: _businessCodeController,
                   ),
                 ),
@@ -56,7 +56,6 @@ class _EmployeeIdScreenState extends State<EmployeeIdScreen> {
     );
   }
 }
-
 
 class _EmployeeGradientBackground extends StatelessWidget {
   const _EmployeeGradientBackground();
@@ -75,23 +74,21 @@ class _EmployeeGradientBackground extends StatelessWidget {
   }
 }
 
-
 class _EmployeeContentCard extends StatelessWidget {
   final TextEditingController businessNameController;
+  final TextEditingController employeeIdController;
   final TextEditingController businessCodeController;
 
   void _handleContinue(BuildContext context) {
-
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const VerifyIdentityScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const VerifyIdentityScreen()),
     );
   }
 
   const _EmployeeContentCard({
     required this.businessNameController,
+    required this.employeeIdController,
     required this.businessCodeController,
   });
 
@@ -113,22 +110,19 @@ class _EmployeeContentCard extends StatelessWidget {
         ],
       ),
 
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const _HeaderLogo(),
-          const SizedBox(height: 20),
-
 
           FadeInAnimation(
             delay: const Duration(milliseconds: 100),
             child: const Text(
               "Enter Company Details",
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF101828),
+                color: Color(0xFF161616),
               ),
             ),
           ),
@@ -138,10 +132,7 @@ class _EmployeeContentCard extends StatelessWidget {
             delay: const Duration(milliseconds: 200),
             child: const Text(
               "Add Your Workplace Info",
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF7D8CA1),
-              ),
+              style: TextStyle(fontSize: 12, color: Color(0xFF666666)),
             ),
           ),
 
@@ -152,15 +143,14 @@ class _EmployeeContentCard extends StatelessWidget {
             offsetY: 30,
             child: Column(
               children: [
-
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Business name",
+                    "Company name",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade700,
-                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -170,22 +160,46 @@ class _EmployeeContentCard extends StatelessWidget {
                   controller: businessNameController,
                   hint: "Search Business",
                   icon: Icons.search,
+                  iconOnRight: false,
                 ),
 
-                const SizedBox(height: 20),
-                const Text("Or",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1))),
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 24),
 
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    "Business Code",
+                    "Employee ID",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey.shade700,
-                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                _CustomInputField(
+                  controller: employeeIdController,
+                  hint: "",
+                  icon: Icons.help_outline,
+                  iconOnRight: true,
+                ),
+
+                const SizedBox(height: 20),
+                const Text(
+                  "Or",
+                  style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
+                ),
+                const SizedBox(height: 20),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Employee Code",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -194,7 +208,8 @@ class _EmployeeContentCard extends StatelessWidget {
                 _CustomInputField(
                   controller: businessCodeController,
                   hint: "",
-                  icon: Icons.info_outline,
+                  icon: Icons.help_outline,
+                  iconOnRight: true,
                 ),
               ],
             ),
@@ -202,20 +217,16 @@ class _EmployeeContentCard extends StatelessWidget {
 
           const Spacer(),
 
-
           SlideInAnimation(
             delay: const Duration(milliseconds: 400),
             offsetY: 30,
-            child: _ContinueButton(
-              onPressed: () => _handleContinue(context),
-            ),
+            child: _ContinueButton(onPressed: () => _handleContinue(context)),
           ),
         ],
       ),
     );
   }
 }
-
 
 class _HeaderLogo extends StatelessWidget {
   const _HeaderLogo();
@@ -225,44 +236,65 @@ class _HeaderLogo extends StatelessWidget {
     return Image.asset(
       'assets/logo/logo-light.png',
       width: 220,
-      
+
       colorBlendMode: BlendMode.srcIn,
     );
   }
 }
 
-
 class _CustomInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
   final IconData icon;
+  final bool iconOnRight;
 
   const _CustomInputField({
     required this.controller,
     required this.hint,
     required this.icon,
+    this.iconOnRight = false,
   });
 
   @override
   Widget build(BuildContext context) {
-
     return TextField(
       controller: controller,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF171A58),
+      ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: const Color(0xFFF5F6FA),
-        prefixIcon: Icon(icon, color: Colors.grey.shade600),
+        fillColor: Colors.white,
+        prefixIcon: iconOnRight
+            ? null
+            : Icon(icon, color: Color(0xFF7D8CA1), size: 22),
+        suffixIcon: iconOnRight
+            ? Icon(icon, color: Color(0xFF7D8CA1), size: 22)
+            : null,
         hintText: hint,
-        contentPadding: const EdgeInsets.symmetric(vertical: 18),
-        border: OutlineInputBorder(
+        hintStyle: TextStyle(
+          fontSize: 15,
+          color: Colors.grey.shade400,
+          fontWeight: FontWeight.w400,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 16,
+        ),
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: Color(0xFFE8E8E8), width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE8E8E8), width: 2),
         ),
       ),
     );
   }
 }
-
 
 class _ContinueButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -298,7 +330,6 @@ class _ContinueButton extends StatelessWidget {
     );
   }
 }
-
 
 class _EmployeeWavePainter extends CustomPainter {
   final double headerHeight;
