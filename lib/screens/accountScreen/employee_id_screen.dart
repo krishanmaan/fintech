@@ -158,7 +158,7 @@ class _EmployeeContentCard extends StatelessWidget {
 
                 _CustomInputField(
                   controller: businessNameController,
-                  hint: "Search Business",
+                  hint: "Nests India (nests)",
                   icon: Icons.search,
                   iconOnRight: false,
                 ),

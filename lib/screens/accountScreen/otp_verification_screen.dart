@@ -180,9 +180,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     child: const Text(
                       'Verify OTP Now',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF171A58),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF161616),
+                        fontFamily: 'poppins',
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -191,8 +192,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   FadeInAnimation(
                     delay: const Duration(milliseconds: 200),
                     child: const Text(
-                      'Enter the OTP code we just sent you on your registered Email/Phone number',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
+                      'Enter the OTP code we just sent you  on your \n registered Email/Phone number',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF161616), fontFamily: 'poppins', fontWeight: FontWeight.w400),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -209,8 +210,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               margin: EdgeInsets.only(
                                 right: index < 5 ? 12 : 0,
                               ),
-                              width: 52,
-                              height: 60,
+                              width: 48,
+                              height: 50,
                               child: TextField(
                                 controller: _otpControllers[index],
                                 focusNode: _focusNodes[index],
@@ -219,10 +220,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 keyboardType: TextInputType.number,
                                 maxLength: 1,
                                 style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF171A58),
-                                  height: 1.2,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF161616),
+                                  fontFamily: 'roboto',
+                                  height: 0.2,
                                 ),
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,

@@ -135,15 +135,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 32),
                   FadeInAnimation(
                     delay: const Duration(milliseconds: 100),
-                    child: const Text(
-                      'LOGIN',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                        color: Color(0xFF171A58),
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Color(0xFF001E40), Color(0xFF5F2E97)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ).createShader(bounds),
+                      child: const Text(
+                        'LOGIN',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          color: Colors.white,
+                          fontFamily: 'Poppins',
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -151,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     delay: const Duration(milliseconds: 200),
                     child: const Text(
                       'Create an account or log in to explore about our app',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF7D8CA1)),
+                      style: TextStyle(fontSize: 12, color: Color(0xFF6C7278), fontFamily: 'inter'),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -169,7 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF101828),
+                              color: Color(0xFF6C7278),
+                              fontFamily: 'poppins',
                             ),
                           ),
                         ),
@@ -228,12 +237,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                             ),
-                            const SizedBox(width: 4),
                             const Text(
                               'Remember me',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFF475467),
+                                color: Color(0xFF6C7278),
                               ),
                             ),
                           ],
@@ -260,8 +268,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 18),
                             foregroundColor: Colors.white,
                             textStyle: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'poppins',
+                              fontStyle: FontStyle.normal,
                             ),
                           ),
                           child: _isLoading
@@ -291,15 +301,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 text: TextSpan(
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF7D8CA1),
+                    color: Color(0xFF6C7278),
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'inter',
+                    fontStyle: FontStyle.normal,
                   ),
                   children: [
                     const TextSpan(text: 'By signing up, you agree to the '),
                     TextSpan(
                       text: 'Terms of Service',
                       style: const TextStyle(
-                        color: Color(0xFF532C8C),
-                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF4D81E7),
+                        fontWeight: FontWeight.w500,
+                        fontStyle: FontStyle.normal,
+                        fontFamily: 'inter',
                       ),
                       recognizer: TapGestureRecognizer()..onTap = () {},
                     ),
@@ -307,8 +322,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextSpan(
                       text: 'Data Processing Agreement.',
                       style: const TextStyle(
-                        color: Color(0xFF532C8C),
-                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF4D81E7),
+                        fontWeight: FontWeight.w500,
+                        fontStyle: FontStyle.normal,
+                        fontFamily: 'inter',
                       ),
                       recognizer: TapGestureRecognizer()..onTap = () {},
                     ),
