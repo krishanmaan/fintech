@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/storage_service.dart';
+import '../../services/advance_salary_service.dart';
 
 /// Withdraw confirmation screen showing breakdown and repayment details
 class WithdrawConfirmationScreen extends StatefulWidget {
@@ -15,6 +17,9 @@ class _WithdrawConfirmationScreenState
     extends State<WithdrawConfirmationScreen> {
   bool _agreedToTerms = false;
   int _selectedAccountIndex = 0;
+  bool _isLoading = true;
+  SalaryBreakdownData? _breakdownData;
+  final StorageService _storageService = StorageService();
 
   // Mock data
   final List<Map<String, String>> _accounts = [
@@ -23,11 +28,87 @@ class _WithdrawConfirmationScreenState
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _fetchBreakdown();
+  }
+
+  Future<void> _fetchBreakdown() async {
+    try {
+      final token = await _storageService.getAccessToken();
+      if (token == null) throw Exception('Not authenticated');
+
+      final service = AdvanceSalaryService(authToken: token);
+      final response = await service.getSalaryBreakdown(
+        amount: widget.withdrawAmount,
+      );
+
+      if (mounted) {
+        setState(() {
+          _breakdownData = response.data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleWithdraw() async {
+    setState(() => _isLoading = true);
+    try {
+      final token = await _storageService.getAccessToken();
+      if (token == null) throw Exception('Not authenticated');
+
+      final service = AdvanceSalaryService(authToken: token);
+      final response = await service.withdrawAmount(
+        amount: widget.withdrawAmount,
+        haveUserLoanConsent: true,
+        haveDebitFreezeUserContent: true,
+      );
+
+      if (mounted) {
+        _showSuccessDialog(context, response.message);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Calculate fees
-    final double fees = 250.0;
-    final double gst = fees * 0.18;
-    final double totalReceived = widget.withdrawAmount - fees - gst;
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // Use data from API or fallbacks (though loading covers the null case mostly)
+    // Adjust mapping based on API response structure matching UI
+    final double gst = _breakdownData?.gstAmount ?? 0.0;
+    final double totalReceived = _breakdownData?.userWillReceive ?? 0.0;
+
+    // Calculate total fees (interest)
+    final double calculatedFees =
+        (_breakdownData?.platformInterestInAmount ?? 0) +
+        (_breakdownData?.lenderInterestInAmount ?? 0);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -71,7 +152,7 @@ class _WithdrawConfirmationScreenState
                                 // Amount breakdown card
                                 _AmountBreakdownCard(
                                   earnedSalary: widget.withdrawAmount,
-                                  fees: fees,
+                                  fees: calculatedFees,
                                   gst: gst,
                                   totalReceived: totalReceived,
                                 ),
@@ -192,12 +273,7 @@ class _WithdrawConfirmationScreenState
           borderRadius: BorderRadius.circular(28),
         ),
         child: TextButton(
-          onPressed: _agreedToTerms
-              ? () {
-                  // Handle withdraw action
-                  _showSuccessDialog(context);
-                }
-              : null,
+          onPressed: _agreedToTerms ? _handleWithdraw : null,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 18),
             foregroundColor: Colors.white,
@@ -206,22 +282,32 @@ class _WithdrawConfirmationScreenState
               fontWeight: FontWeight.w600,
             ),
           ),
-          child: const Text('Withdraw'),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : const Text('Withdraw'),
         ),
       ),
     );
   }
 
-  void _showSuccessDialog(BuildContext context) {
+  void _showSuccessDialog(BuildContext context, String message) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Icon(Icons.check_circle, color: Colors.green, size: 60),
-        content: const Text(
-          'Withdrawal request submitted successfully!',
+        content: Text(
+          message,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16),
         ),
         actions: [
           TextButton(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'withdraw_confirmation_screen.dart';
+import '../../services/storage_service.dart';
+import '../../services/advance_salary_service.dart';
 
 /// Withdraw money screen with beautiful gradient header and triangle design
 class WithdrawScreen extends StatefulWidget {
@@ -10,13 +12,69 @@ class WithdrawScreen extends StatefulWidget {
 }
 
 class _WithdrawScreenState extends State<WithdrawScreen> {
-  double _withdrawalAmount = 5600.0;
-  final double _minAmount = 500.0;
-  final double _maxAmount = 5600.0;
+  double _withdrawalAmount = 5000.0;
+  double _minAmount = 500.0;
+  double _maxAmount = 50000.0; // Default fallback
+  double _availableLimit = 0.0;
   bool _showNoteBanner = true;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAvailableAmount();
+  }
+
+  Future<void> _fetchAvailableAmount() async {
+    try {
+      final storageService = StorageService();
+      final token = await storageService.getAccessToken();
+
+      if (token == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final service = AdvanceSalaryService(authToken: token);
+      final response = await service.getAvailableAmount();
+
+      if (mounted) {
+        setState(() {
+          _minAmount = response.data.minimumWithdrawLimit;
+          _maxAmount = response.data.availableAmountLimit;
+          _availableLimit = response.data.availableAmountLimit;
+
+          // Ensure withdrawal amount is within valid range
+          if (_withdrawalAmount > _maxAmount) {
+            _withdrawalAmount = _maxAmount;
+          }
+          if (_withdrawalAmount < _minAmount) {
+            _withdrawalAmount = _minAmount;
+          }
+
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
@@ -59,6 +117,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                 // Note banner
                                 if (_showNoteBanner)
                                   _NoteBanner(
+                                    availableLimit: _availableLimit,
                                     onDismiss: () =>
                                         setState(() => _showNoteBanner = false),
                                   ),
@@ -191,9 +250,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
 
 /// Note banner dismissible component
 class _NoteBanner extends StatelessWidget {
-  const _NoteBanner({required this.onDismiss});
+  const _NoteBanner({required this.onDismiss, required this.availableLimit});
 
   final VoidCallback onDismiss;
+  final double availableLimit;
 
   @override
   Widget build(BuildContext context) {
@@ -213,10 +273,10 @@ class _NoteBanner extends StatelessWidget {
               color: Color(0xFF101828),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Your withdrawal limit may differ from your actual salary, as determined by your employer.',
-              style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
+              'Your available withdrawal limit is ₹${availableLimit.toStringAsFixed(0)}. Limits are determined by your employer.',
+              style: const TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
             ),
           ),
           const SizedBox(width: 8),

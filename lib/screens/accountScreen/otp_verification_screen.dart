@@ -193,7 +193,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     delay: const Duration(milliseconds: 200),
                     child: const Text(
                       'Enter the OTP code we just sent you  on your \n registered Email/Phone number',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF161616), fontFamily: 'poppins', fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF161616),
+                        fontFamily: 'poppins',
+                        fontWeight: FontWeight.w400,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -254,7 +259,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   disabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     borderSide: BorderSide(
-                                      color: Color(0xFFB08BFF).withOpacity(0.5),
+                                      color: Color(
+                                        0xFFB08BFF,
+                                      ).withValues(alpha: 0.5),
                                       width: 1.5,
                                     ),
                                   ),
