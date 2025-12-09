@@ -12,8 +12,8 @@ class WithdrawScreen extends StatefulWidget {
 }
 
 class _WithdrawScreenState extends State<WithdrawScreen> {
-  double _withdrawalAmount = 5000.0;
-  double _minAmount = 500.0;
+  double _withdrawalAmount = 2000.0; // Will be updated after API call
+  double _minAmount = 2000.0;
   double _maxAmount = 50000.0; // Default fallback
   double _availableLimit = 0.0;
   bool _showNoteBanner = true;
@@ -398,30 +398,53 @@ class _WithdrawalAmountCard extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Quick selection buttons
-          Row(
-            children: [
-              Expanded(
-                child: _QuickAmountButton(
-                  amount: 1000,
-                  onTap: () => onAmountChanged(1000),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _QuickAmountButton(
-                  amount: 3000,
-                  onTap: () => onAmountChanged(3000),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _QuickAmountButton(
-                  amount: 2500,
-                  onTap: () => onAmountChanged(2500),
-                ),
-              ),
-            ],
+          // Quick selection buttons - Dynamic based on limits
+          Builder(
+            builder: (context) {
+              final range = maxAmount - minAmount;
+              double amount1, amount2, amount3;
+
+              if (range < 5000) {
+                amount1 = minAmount;
+                amount2 = (minAmount + maxAmount) / 2;
+                amount3 = maxAmount;
+              } else {
+                amount1 = minAmount;
+                amount2 =
+                    (((minAmount + maxAmount) / 2) / 1000).round() * 1000.0;
+                amount3 = ((maxAmount * 0.8) / 1000).round() * 1000.0;
+
+                if (amount2 < minAmount) amount2 = minAmount;
+                if (amount2 > maxAmount) amount2 = maxAmount;
+                if (amount3 < minAmount) amount3 = minAmount;
+                if (amount3 > maxAmount) amount3 = maxAmount;
+              }
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: _QuickAmountButton(
+                      amount: amount1,
+                      onTap: () => onAmountChanged(amount1),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickAmountButton(
+                      amount: amount2,
+                      onTap: () => onAmountChanged(amount2),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _QuickAmountButton(
+                      amount: amount3,
+                      onTap: () => onAmountChanged(amount3),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
 
           const SizedBox(height: 20),

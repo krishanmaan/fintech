@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../services/storage_service.dart';
+import '../../services/advance_salary_service.dart';
 
-
-/// Transaction History screen showing all user transactions
+/// Transaction History screen showing all user transactions with real API data
 class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
 
@@ -11,48 +12,119 @@ class TransactionHistoryScreen extends StatefulWidget {
 }
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
-  String _selectedFilter = 'Completed';
-  String _selectedPeriod = 'This week';
-  int? _expandedTransactionIndex; // Track which transaction is expanded
+  String _selectedFilter = 'All';
+  String _selectedPeriod = 'This month';
+  int? _expandedTransactionIndex;
 
+  // API related state
+  bool _isLoading = true;
+  List<AdvanceSalaryLoan> _loans = [];
+  String? _errorMessage;
 
-  final List<Map<String, dynamic>> _transactions = [
-    {
-      'title': 'On-Demand salary',
-      'transactionId': '698094554317',
-      'amount': 5600.00,
-      'status': 'Completed',
-      'date': '17 Sep 2023',
-      'time': '11:21 AM',
-    },
-    {
-      'title': 'On-Demand salary',
-      'transactionId': '698094554317',
-      'amount': 5600.00,
-      'status': 'Completed',
-      'date': '17 Sep 2025',
-      'time': '11:21 AM',
-    },
-    {
-      'title': 'On-Demand salary',
-      'transactionId': '698094554317',
-      'amount': 5600.00,
-      'status': 'Completed',
-      'date': '17 Sep 2025',
-      'time': '11:21 AM',
-    },
-    {
-      'title': 'On-Demand salary',
-      'transactionId': '698094554317',
-      'amount': 5600.00,
-      'status': 'Completed',
-      'date': '17 Sep 2025',
-      'time': '11:21 AM',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchTransactions();
+  }
+
+  Future<void> _fetchTransactions() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final storageService = StorageService();
+      final token = await storageService.getAccessToken();
+
+      if (token == null) {
+        throw Exception('Not authenticated. Please login again.');
+      }
+
+      final service = AdvanceSalaryService(authToken: token);
+      final response = await service.getAllAdvanceSalaries(page: 1, limit: 50);
+
+      if (mounted) {
+        setState(() {
+          _loans = response.data.data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        String errorMsg = e.toString();
+
+        // Better error message for 401
+        if (errorMsg.contains('401') || errorMsg.contains('blocked')) {
+          errorMsg = 'Your session has expired. Please logout and login again.';
+        } else if (errorMsg.contains('Not authenticated')) {
+          errorMsg = 'Please login to view transactions.';
+        }
+
+        setState(() {
+          _isLoading = false;
+          _errorMessage = errorMsg;
+        });
+      }
+    }
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month - 1];
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day} ${_getMonthName(date.month)} ${date.year}';
+  }
+
+  String _formatTime(DateTime date) {
+    final hour = date.hour > 12 ? date.hour - 12 : date.hour;
+    final period = date.hour >= 12 ? 'PM' : 'AM';
+    return '${hour}:${date.minute.toString().padLeft(2, '0')} $period';
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Show loading state
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // Show error state
+    if (_errorMessage != null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(_errorMessage!),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _fetchTransactions,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -88,7 +160,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header (now inside white container)
+                        // Header
                         _buildHeader(context),
 
                         const SizedBox(height: 20),
@@ -111,39 +183,26 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
                         // Transaction list
                         Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
-                            itemCount: _transactions.length,
-                            itemBuilder: (context, index) {
-                              final transaction = _transactions[index];
-                              
-                              // Show date header
-                              bool showDateHeader = index == 0 ||
-                                  _transactions[index - 1]['date'] !=
-                                      transaction['date'];
-
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (showDateHeader) ...[
-                                    if (index != 0) const SizedBox(height: 16),
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 12),
-                                      child: Text(
-                                        transaction['date'],
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF6B7280),
-                                        ),
-                                      ),
+                          child: _loans.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    'No transactions found',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Color(0xFF6B7280),
                                     ),
-                                  ],
-                                  _buildTransactionItem(transaction),
-                                ],
-                              );
-                            },
-                          ),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                  ),
+                                  itemCount: _loans.length,
+                                  itemBuilder: (context, index) {
+                                    final loan = _loans[index];
+                                    return _buildTransactionItem(loan, index);
+                                  },
+                                ),
                         ),
                       ],
                     ),
@@ -181,46 +240,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
               ),
             ),
           ),
-          // Search icon
-          GestureDetector(
-            onTap: () {
-              // Handle search
-            },
-            child: const Icon(
-              Icons.search,
-              size: 24,
-              color: Color(0xFF101828),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Filter icon
-          GestureDetector(
-            onTap: () {
-              _showFilterBottomSheet(context);
-            },
-            child: const Icon(
-              Icons.tune,
-              size: 24,
-              color: Color(0xFF101828),
-            ),
-          ),
         ],
-      ),
-    );
-  }
-
-  void _showFilterBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _FilterBottomSheet(
-        selectedPeriod: _selectedPeriod,
-        onApplyFilters: (period, statusFilters) {
-          setState(() {
-            _selectedPeriod = period;
-          });
-        },
       ),
     );
   }
@@ -244,7 +264,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   }
 
   Widget _buildCategoryFilters() {
-    final filters = ['Completed', 'My loan', 'Gold', 'Payment'];
+    final filters = ['All', 'Disbursed', 'Pending'];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -286,9 +306,13 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     );
   }
 
-  Widget _buildTransactionItem(Map<String, dynamic> transaction) {
-    final index = _transactions.indexOf(transaction);
+  Widget _buildTransactionItem(AdvanceSalaryLoan loan, int index) {
     final isExpanded = _expandedTransactionIndex == index;
+
+    // Format date and time
+    final date = DateTime.parse(loan.createdAt);
+    final formattedDate = _formatDate(date);
+    final formattedTime = _formatTime(date);
 
     return GestureDetector(
       onTap: () {
@@ -320,8 +344,8 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                 Container(
                   width: 50,
                   height: 50,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF482983),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF482983),
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
@@ -340,9 +364,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        transaction['title'],
-                        style: const TextStyle(
+                      const Text(
+                        'Advance Salary',
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF101828),
@@ -350,14 +374,14 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Transaction ID',
+                        loan.lenderName,
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF98A2B3),
                         ),
                       ),
                       Text(
-                        transaction['transactionId'],
+                        'Loan ID: ...${loan.loanId.substring(loan.loanId.length - 8)}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFF6B7280),
@@ -372,7 +396,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '₹${transaction['amount'].toStringAsFixed(2)}',
+                      '₹${loan.requestedLoanAmount.toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -381,24 +405,30 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                     ),
                     const SizedBox(height: 4),
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD1FAE5),
+                        color: loan.loanStatus == 'DISBURSED'
+                            ? const Color(0xFFD1FAE5)
+                            : const Color(0xFFFEE2E2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        transaction['status'],
-                        style: const TextStyle(
+                        loan.loanStatus,
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF059669),
+                          color: loan.loanStatus == 'DISBURSED'
+                              ? const Color(0xFF059669)
+                              : const Color(0xFFDC2626),
                         ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${transaction['date']} ${transaction['time']}',
+                      '$formattedDate $formattedTime',
                       style: const TextStyle(
                         fontSize: 11,
                         color: Color(0xFF98A2B3),
@@ -434,22 +464,11 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Salary Advance Details',
+                  'Loan Details',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF101828),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Early Salary',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF6B7280),
                   ),
                 ),
               ),
@@ -457,131 +476,34 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
               const SizedBox(height: 16),
 
               // Details rows
-              _buildDetailRow('Loan Amount', '₹ 2,373.00'),
-              const SizedBox(height: 8),
-              _buildDetailRow('Due: Sep 1, 2025', 'Auto Pay', 
-                  valueColor: const Color(0xFF482983)),
-              const SizedBox(height: 8),
-              _buildDetailRow('Fee (Incl. GST)', '₹ 42.00'),
-              const SizedBox(height: 8),
-              _buildDetailRow('Amount You\'ll Receive', '₹ 2,331.00',
-                  valueColor: const Color(0xFF10B981)),
-              const SizedBox(height: 8),
-              _buildDetailRow('Tenure', '1 Month'),
-              const SizedBox(height: 8),
-              _buildDetailRow('Repayment Date', 'As Per Schedule'),
-
-              const SizedBox(height: 20),
-
-              // Repayment Schedule
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Repayment Schedule',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF101828),
-                  ),
-                ),
+              _buildDetailRow(
+                'Loan Amount',
+                '₹ ${loan.totalDisbursedLoanAmount.toStringAsFixed(0)}',
               ),
-
-              const SizedBox(height: 12),
-
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color:
-                            const Color(0xFF482983).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.calendar_month,
-                        color: Color(0xFF482983),
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Repayment',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Dec 1',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF101828),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Text(
-                      '₹ 2,373.00',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF101828),
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Interest',
+                '₹ ${loan.totalLoanInterestInAmount.toStringAsFixed(0)}',
               ),
-
-              const SizedBox(height: 16),
-
-              // Late Payment Charges
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFBBF24)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          'Late Payment Charges',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFFD97706),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    _buildWarningItem(
-                      'Rate of annualized penal charges in case of delayed payment is 36% per annum for each day of delay',
-                    ),
-                    const SizedBox(height: 6),
-                    _buildWarningItem(
-                      'On Late Payment there will be charge of ₹500/- per late payment OR dishonor of Cheque/ECS/NACH',
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 8),
+              _buildDetailRow('GST', '₹ ${loan.gstAmount.toStringAsFixed(0)}'),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Amount You Received',
+                '₹ ${loan.userReceivedLoanAmountAfterDeduction.toStringAsFixed(0)}',
+                valueColor: const Color(0xFF10B981),
+              ),
+              const SizedBox(height: 8),
+              _buildDetailRow('Company', loan.companyDetails.name),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Billing Month',
+                loan.companyDetails.billingMonth,
+              ),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Company Payable',
+                '₹ ${loan.companyDetails.totalPayable.toStringAsFixed(0)}',
               ),
             ],
           ],
@@ -596,385 +518,20 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: Color(0xFF6B7280),
-          ),
+          style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: valueColor ?? const Color(0xFF101828),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWarningItem(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 2),
-          child: Icon(
-            Icons.warning_amber_rounded,
-            color: Color(0xFFD97706),
-            size: 14,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Expanded(
+        Flexible(
           child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Color(0xFF92400E),
-              height: 1.4,
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: valueColor ?? const Color(0xFF101828),
             ),
+            textAlign: TextAlign.right,
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Filter Bottom Sheet
-class _FilterBottomSheet extends StatefulWidget {
-  final String selectedPeriod;
-  final Function(String period, List<String> statusFilters) onApplyFilters;
-
-  const _FilterBottomSheet({
-    required this.selectedPeriod,
-    required this.onApplyFilters,
-  });
-
-  @override
-  State<_FilterBottomSheet> createState() => _FilterBottomSheetState();
-}
-
-class _FilterBottomSheetState extends State<_FilterBottomSheet> {
-  late String _selectedPeriod;
-  late List<String> _selectedStatuses;
-  DateTime? _startDate;
-  DateTime? _endDate;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedPeriod = widget.selectedPeriod;
-    _selectedStatuses = ['Completed'];
-  }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Filters',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF101828),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedPeriod = 'This week';
-                    _selectedStatuses = ['Completed'];
-                    _startDate = null;
-                    _endDate = null;
-                  });
-                },
-                child: const Text(
-                  'Clear',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF482983),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          // Period section
-          const Text(
-            'Period',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF101828),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Period options
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: ['This week', 'This month', 'Previous month', 'This year']
-                .map((period) {
-              final isSelected = _selectedPeriod == period;
-              return GestureDetector(
-                onTap: () {
-                  setState(() => _selectedPeriod = period);
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFFEDE9FE)
-                        : const Color(0xFFF9FAFB),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF482983)
-                          : const Color(0xFFE5E7EB),
-                    ),
-                  ),
-                  child: Text(
-                    period,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: isSelected
-                          ? const Color(0xFF482983)
-                          : const Color(0xFF6B7280),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Select period label
-          const Text(
-            'Select period',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF6B7280),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Date range pickers
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: _startDate ?? DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                    );
-                    if (date != null) {
-                      setState(() => _startDate = date);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            size: 16, color: Color(0xFF6B7280)),
-                        const SizedBox(width: 8),
-                        Text(
-                          _startDate != null
-                              ? _formatDate(_startDate!)
-                              : '1 Sep 2024',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF101828),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Icon(Icons.arrow_forward,
-                    size: 16, color: Color(0xFF6B7280)),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: _endDate ?? DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                    );
-                    if (date != null) {
-                      setState(() => _endDate = date);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today,
-                            size: 16, color: Color(0xFF6B7280)),
-                        const SizedBox(width: 8),
-                        Text(
-                          _endDate != null
-                              ? _formatDate(_endDate!)
-                              : '20 Sep 2024',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF101828),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // Status section
-          const Text(
-            'Status',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF101828),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Status options
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: ['Completed', 'Pending', 'Canceled'].map((status) {
-              final isSelected = _selectedStatuses.contains(status);
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    if (isSelected) {
-                      _selectedStatuses.remove(status);
-                    } else {
-                      _selectedStatuses.add(status);
-                    }
-                  });
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? const Color(0xFFEDE9FE)
-                        : const Color(0xFFF9FAFB),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF482983)
-                          : const Color(0xFFE5E7EB),
-                    ),
-                  ),
-                  child: Text(
-                    status,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: isSelected
-                          ? const Color(0xFF482983)
-                          : const Color(0xFF6B7280),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Show results button
-          SizedBox(
-            width: double.infinity,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF532C8C), Color(0xFF171A58)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: TextButton(
-                onPressed: () {
-                  widget.onApplyFilters(_selectedPeriod, _selectedStatuses);
-                  Navigator.pop(context);
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  foregroundColor: Colors.white,
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                child: Text('Show results (${_selectedStatuses.length})'),
-              ),
-            ),
-          ),
-
-          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-        ],
-      ),
     );
   }
 }
