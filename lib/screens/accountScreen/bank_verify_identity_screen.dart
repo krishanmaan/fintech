@@ -69,6 +69,14 @@ class _BankVerifyIdentityScreenState extends State<BankVerifyIdentityScreen> {
 
       if (!mounted) return;
 
+      // Save bank details after successful verification
+      await storageService.saveBankDetails({
+        'accountNumber': _accountController.text.trim(),
+        'ifscCode': _ifscController.text.trim(),
+        'branchName': _branchController.text.trim(),
+        'bankName': 'Bank Name', // You can add a bank name field if needed
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(response.message),

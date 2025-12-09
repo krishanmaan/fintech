@@ -21,16 +21,55 @@ class _WithdrawConfirmationScreenState
   SalaryBreakdownData? _breakdownData;
   final StorageService _storageService = StorageService();
 
-  // Mock data
-  final List<Map<String, String>> _accounts = [
-    {'bankName': 'HDFC Bank', 'accountNumber': '******5602'},
-    {'bankName': 'SBI Bank', 'accountNumber': '******7890'},
-  ];
+  // Bank accounts - will be loaded from storage
+  List<Map<String, String>> _accounts = [];
 
   @override
   void initState() {
     super.initState();
+    _loadBankDetails();
     _fetchBreakdown();
+  }
+
+  Future<void> _loadBankDetails() async {
+    try {
+      final bankDetails = await _storageService.getBankDetails();
+      if (bankDetails != null && mounted) {
+        setState(() {
+          // Mask account number for display (show last 4 digits)
+          final accNumber = bankDetails['accountNumber'] ?? '';
+          final maskedNumber = accNumber.length > 4
+              ? '******${accNumber.substring(accNumber.length - 4)}'
+              : accNumber;
+
+          _accounts = [
+            {
+              'bankName': bankDetails['bankName'] ?? 'Your Bank',
+              'accountNumber': maskedNumber,
+              'ifscCode': bankDetails['ifscCode'] ?? '',
+              'branchName': bankDetails['branchName'] ?? '',
+            },
+          ];
+        });
+      } else {
+        // If no bank details found, show placeholder
+        setState(() {
+          _accounts = [
+            {'bankName': 'No Bank Added', 'accountNumber': 'Please add bank'},
+          ];
+        });
+      }
+    } catch (e) {
+      print('Error loading bank details: $e');
+      // Fallback to default
+      if (mounted) {
+        setState(() {
+          _accounts = [
+            {'bankName': 'Bank Account', 'accountNumber': '******0000'},
+          ];
+        });
+      }
+    }
   }
 
   Future<void> _fetchBreakdown() async {

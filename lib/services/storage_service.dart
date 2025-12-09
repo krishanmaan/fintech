@@ -10,6 +10,25 @@ class StorageService {
   static const String _keyKycStatus = 'kyc_status';
   static const String _keyUserRole = 'user_role';
   static const String _keyPhoneNumber = 'phone_number';
+  static const String _keyBankDetails = 'bank_details';
+
+  // Save bank account details
+  Future<void> saveBankDetails(Map<String, String> bankDetails) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyBankDetails, jsonEncode(bankDetails));
+    print('💾 Bank details saved successfully');
+  }
+
+  // Get bank account details
+  Future<Map<String, String>?> getBankDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bankData = prefs.getString(_keyBankDetails);
+    if (bankData != null) {
+      final decoded = jsonDecode(bankData) as Map<String, dynamic>;
+      return decoded.map((key, value) => MapEntry(key, value.toString()));
+    }
+    return null;
+  }
 
   Future<void> saveLoginData(LoginData loginData) async {
     final prefs = await SharedPreferences.getInstance();
