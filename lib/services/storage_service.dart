@@ -94,6 +94,23 @@ class StorageService {
     return token != null && token.isNotEmpty;
   }
 
+  Future<void> saveLoginState({required bool isLoggedIn}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_logged_in', isLoggedIn);
+    print('💾 Login state saved: $isLoggedIn');
+  }
+
+  Future<bool> getLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('is_logged_in') ?? false;
+  }
+
+  Future<void> clearLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('is_logged_in');
+    print('🗑️ Login state cleared');
+  }
+
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();

@@ -543,10 +543,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-              // Handle logout
+            onPressed: () async {
+              await _storageService.clearAll();
+
+              if (!mounted) return;
+
               Navigator.of(context).popUntil((route) => route.isFirst);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Logged out successfully'),
+                  backgroundColor: Colors.green,
+                  duration: Duration(seconds: 2),
+                ),
+              );
             },
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFEF4444),

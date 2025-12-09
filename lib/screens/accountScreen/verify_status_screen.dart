@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
+import '../../services/storage_service.dart';
 import '../mainScreen/home.dart';
 
-
 enum KycStatus { completed, pending }
-
 
 class VarifyStatiusScreen extends StatefulWidget {
   final KycStatus status;
 
-  const VarifyStatiusScreen({
-    super.key,
-    this.status = KycStatus.completed,
-  });
+  const VarifyStatiusScreen({super.key, this.status = KycStatus.completed});
 
   @override
   State<VarifyStatiusScreen> createState() => _VarifyStatiusScreenState();
 }
 
 class _VarifyStatiusScreenState extends State<VarifyStatiusScreen> {
+  final _storageService = StorageService();
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
-        ),
-      );
-    });
+    _handleStatusCompletion();
+  }
+
+  Future<void> _handleStatusCompletion() async {
+    if (widget.status == KycStatus.completed) {
+      await _storageService.saveLoginState(isLoggedIn: true);
+      print('✅ Login state saved - User is now logged in permanently');
+    }
+
+    await Future.delayed(const Duration(seconds: 3));
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
   }
 
   @override
@@ -144,10 +149,7 @@ class _StatusHighlightCard extends StatelessWidget {
               color: theme.iconBackground,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              theme.icon,
-              color: theme.primaryColor,
-            ),
+            child: Icon(theme.icon, color: theme.primaryColor),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -217,10 +219,7 @@ class _StatusListCard extends StatelessWidget {
               SizedBox(height: 6),
               Text(
                 "Government ID",
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF98A2B3),
-                ),
+                style: TextStyle(fontSize: 13, color: Color(0xFF98A2B3)),
               ),
             ],
           ),
@@ -270,10 +269,7 @@ class _StatusFooter extends StatelessWidget {
           status == KycStatus.completed
               ? "Status updated 2 mins ago"
               : "Awaiting final review",
-          style: const TextStyle(
-            fontSize: 13,
-            color: Color(0xFF98A2B3),
-          ),
+          style: const TextStyle(fontSize: 13, color: Color(0xFF98A2B3)),
         ),
       ],
     );
@@ -325,4 +321,3 @@ class _StatusTheme {
     );
   }
 }
-

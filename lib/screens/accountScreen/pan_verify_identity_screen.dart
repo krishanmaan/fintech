@@ -96,8 +96,9 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
   }
 
   Future<void> _openDatePicker() async {
-    DateTime tempSelected = _selectedDate ?? DateTime(2002, 5, 7);
+    DateTime tempSelected = _selectedDate ?? DateTime(2000, 1, 1);
     DateTime visibleMonth = DateTime(tempSelected.year, tempSelected.month, 1);
+
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.white,
@@ -116,6 +117,190 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                   1,
                 );
               });
+            }
+
+            Future<void> showYearMonthPicker() async {
+              int selectedYear = visibleMonth.year;
+              int selectedMonth = visibleMonth.month;
+
+              await showDialog(
+                context: context,
+                builder: (dialogContext) => StatefulBuilder(
+                  builder: (dialogContext, setDialogState) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    title: const Text(
+                      'Select Year & Month',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Year Selector
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F6FA),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Year:',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        setDialogState(() {
+                                          selectedYear--;
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.remove_circle_outline,
+                                      ),
+                                      color: const Color(0xFF5B2B8F),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        '$selectedYear',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        setDialogState(() {
+                                          selectedYear++;
+                                        });
+                                      },
+                                      icon: const Icon(
+                                        Icons.add_circle_outline,
+                                      ),
+                                      color: const Color(0xFF5B2B8F),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Month Grid
+                          const Text(
+                            'Select Month:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  childAspectRatio: 2.5,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                ),
+                            itemCount: 12,
+                            itemBuilder: (context, index) {
+                              final monthNames = [
+                                'Jan',
+                                'Feb',
+                                'Mar',
+                                'Apr',
+                                'May',
+                                'Jun',
+                                'Jul',
+                                'Aug',
+                                'Sep',
+                                'Oct',
+                                'Nov',
+                                'Dec',
+                              ];
+                              final isSelected = selectedMonth == index + 1;
+                              return GestureDetector(
+                                onTap: () {
+                                  setDialogState(() {
+                                    selectedMonth = index + 1;
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? const Color(0xFF5B2B8F)
+                                        : const Color(0xFFF5F6FA),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    monthNames[index],
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : const Color(0xFF101828),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setModalState(() {
+                            visibleMonth = DateTime(
+                              selectedYear,
+                              selectedMonth,
+                              1,
+                            );
+                          });
+                          Navigator.pop(dialogContext);
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF5B2B8F),
+                        ),
+                        child: const Text('Apply'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
 
             List<Widget> buildCalendarDays() {
@@ -240,12 +425,41 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                         icon: Icons.arrow_back_ios_new_rounded,
                         onTap: () => changeMonth(-1),
                       ),
-                      Text(
-                        _formatMonthYear(visibleMonth),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF101828),
+                      GestureDetector(
+                        onTap: showYearMonthPicker,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F6FA),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(
+                                0xFF5B2B8F,
+                              ).withValues(alpha: 0.2),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _formatMonthYear(visibleMonth),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF101828),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(
+                                Icons.arrow_drop_down,
+                                color: Color(0xFF5B2B8F),
+                                size: 20,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       _DateNavButton(
