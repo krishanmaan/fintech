@@ -116,6 +116,39 @@ class AdvanceSalaryService {
       throw ApiException('Network error: ${e.toString()}');
     }
   }
+
+  Future<AllAdvanceSalariesResponse> getAllAdvanceSalaries({
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      final url = Uri.parse(
+        '$baseUrl/advance-salary/get/all?page=$page&limit=$limit',
+      );
+      print('🔍 Fetching All Advance Salaries');
+      print('📡 Request URL: $url');
+
+      final response = await http.get(url, headers: _headers);
+
+      print('📥 Response status: ${response.statusCode}');
+      print('📥 Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+        return AllAdvanceSalariesResponse.fromJson(jsonResponse);
+      } else {
+        final errorBody = jsonDecode(response.body);
+        throw ApiException(
+          errorBody['message'] ?? 'Failed to fetch advance salaries',
+          statusCode: response.statusCode,
+        );
+      }
+    } catch (e) {
+      print('❌ Error in getAllAdvanceSalaries: $e');
+      if (e is ApiException) rethrow;
+      throw ApiException('Network error: ${e.toString()}');
+    }
+  }
 }
 
 class AvailableAmountResponse {
@@ -294,6 +327,178 @@ class WithdrawData {
       totalDeduction: (json['total_deduction'] as num).toDouble(),
       earnedAsPlatform: (json['earned_as_platform'] as num).toDouble(),
       loanStatus: json['loan_status'],
+    );
+  }
+}
+
+// New models for getAllAdvanceSalaries API
+class AllAdvanceSalariesResponse {
+  final int status;
+  final String message;
+  final AllAdvanceSalariesData data;
+
+  AllAdvanceSalariesResponse({
+    required this.status,
+    required this.message,
+    required this.data,
+  });
+
+  factory AllAdvanceSalariesResponse.fromJson(Map<String, dynamic> json) {
+    return AllAdvanceSalariesResponse(
+      status: json['status'],
+      message: json['message'],
+      data: AllAdvanceSalariesData.fromJson(json['data']),
+    );
+  }
+}
+
+class AllAdvanceSalariesData {
+  final int total;
+  final int page;
+  final int limit;
+  final List<AdvanceSalaryLoan> data;
+
+  AllAdvanceSalariesData({
+    required this.total,
+    required this.page,
+    required this.limit,
+    required this.data,
+  });
+
+  factory AllAdvanceSalariesData.fromJson(Map<String, dynamic> json) {
+    return AllAdvanceSalariesData(
+      total: json['total'],
+      page: json['page'],
+      limit: json['limit'],
+      data: (json['data'] as List)
+          .map((item) => AdvanceSalaryLoan.fromJson(item))
+          .toList(),
+    );
+  }
+}
+
+class AdvanceSalaryLoan {
+  final String id;
+  final String employeeId;
+  final String companyId;
+  final String loanId;
+  final String lenderId;
+  final String lenderName;
+  final double requestedLoanAmount;
+  final double totalDisbursedLoanAmount;
+  final double totalLoanPercentage;
+  final double totalLoanInterestInAmount;
+  final double lenderInterestPercentage;
+  final double lenderInterestInAmount;
+  final double platformInterestPercentage;
+  final double platformInterestInAmount;
+  final double gstPercentage;
+  final double gstAmount;
+  final double userReceivedLoanAmountAfterDeduction;
+  final double earnedAsPlatform;
+  final String loanStatus;
+  final int disbursedMonth;
+  final int disbursedYear;
+  final CompanyDetails companyDetails;
+  final bool autoApproved;
+  final bool isDeleted;
+  final String createdAt;
+
+  AdvanceSalaryLoan({
+    required this.id,
+    required this.employeeId,
+    required this.companyId,
+    required this.loanId,
+    required this.lenderId,
+    required this.lenderName,
+    required this.requestedLoanAmount,
+    required this.totalDisbursedLoanAmount,
+    required this.totalLoanPercentage,
+    required this.totalLoanInterestInAmount,
+    required this.lenderInterestPercentage,
+    required this.lenderInterestInAmount,
+    required this.platformInterestPercentage,
+    required this.platformInterestInAmount,
+    required this.gstPercentage,
+    required this.gstAmount,
+    required this.userReceivedLoanAmountAfterDeduction,
+    required this.earnedAsPlatform,
+    required this.loanStatus,
+    required this.disbursedMonth,
+    required this.disbursedYear,
+    required this.companyDetails,
+    required this.autoApproved,
+    required this.isDeleted,
+    required this.createdAt,
+  });
+
+  factory AdvanceSalaryLoan.fromJson(Map<String, dynamic> json) {
+    return AdvanceSalaryLoan(
+      id: json['_id'],
+      employeeId: json['employee_id'],
+      companyId: json['company_id'],
+      loanId: json['loan_id'],
+      lenderId: json['lender_id'],
+      lenderName: json['lender_name'],
+      requestedLoanAmount: (json['requested_loan_amount'] as num).toDouble(),
+      totalDisbursedLoanAmount: (json['total_disbursed_loan_amount'] as num)
+          .toDouble(),
+      totalLoanPercentage: (json['total_loan_percentage'] as num).toDouble(),
+      totalLoanInterestInAmount: (json['total_loan_interest_in_amount'] as num)
+          .toDouble(),
+      lenderInterestPercentage: (json['lender_interest_percentage'] as num)
+          .toDouble(),
+      lenderInterestInAmount: (json['lender_interest_in_amount'] as num)
+          .toDouble(),
+      platformInterestPercentage: (json['platform_interest_percentage'] as num)
+          .toDouble(),
+      platformInterestInAmount: (json['platform_interest_in_amount'] as num)
+          .toDouble(),
+      gstPercentage: (json['gst_percentage'] as num).toDouble(),
+      gstAmount: (json['gst_amount'] as num).toDouble(),
+      userReceivedLoanAmountAfterDeduction:
+          (json['user_received_loan_amount_after_deduction'] as num).toDouble(),
+      earnedAsPlatform: (json['earned_as_platform'] as num).toDouble(),
+      loanStatus: json['loan_status'],
+      disbursedMonth: json['disbursed_month'],
+      disbursedYear: json['disbursed_year'],
+      companyDetails: CompanyDetails.fromJson(json['company_details']),
+      autoApproved: json['auto_approved'],
+      isDeleted: json['is_deleted'],
+      createdAt: json['created_at'],
+    );
+  }
+}
+
+class CompanyDetails {
+  final String name;
+  final double totalPayable;
+  final String billingMonth;
+  final bool billGenerated;
+  final bool billPaid;
+  final String billDueDate;
+  final double companyPaidForThisLoanTillNow;
+
+  CompanyDetails({
+    required this.name,
+    required this.totalPayable,
+    required this.billingMonth,
+    required this.billGenerated,
+    required this.billPaid,
+    required this.billDueDate,
+    required this.companyPaidForThisLoanTillNow,
+  });
+
+  factory CompanyDetails.fromJson(Map<String, dynamic> json) {
+    return CompanyDetails(
+      name: json['name'],
+      totalPayable: (json['total_payable'] as num).toDouble(),
+      billingMonth: json['billing_month'],
+      billGenerated: json['bill_generated'],
+      billPaid: json['bill_paid'],
+      billDueDate: json['bill_due_date'],
+      companyPaidForThisLoanTillNow:
+          (json['company_paid_for_this_loan_till_now'] as num).toDouble(),
     );
   }
 }
