@@ -6,7 +6,6 @@ import '../../services/storage_service.dart';
 import 'withdraw.dart';
 import 'profile_screen.dart';
 
-/// Main home/dashboard screen jo user ko salary aur essentials dikhata hai.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double _salary = 0.0;
   String _kycStatus = 'NOT_STARTED';
   bool _isLoading = true;
-  bool _isSalaryVisible = false; // Salary visibility state
+  bool _isSalaryVisible = false;
 
   @override
   void initState() {
@@ -73,30 +72,22 @@ class _HomeScreenState extends State<HomeScreen> {
         responsive: responsive,
         currentIndex: 0,
         onTap: (index) {
-          // Handle navigation based on index
           if (index == 3) {
-            // Navigate to Profile screen
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           }
           if (index == 1) {
-            // Navigate to Salary screen
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const WithdrawScreen()),
             );
           }
-          // Other tabs can be handled here
-          // index 0: Home (current screen)
-          // index 1: Salary
-          // index 2: Explore cards
         },
       ),
       body: Stack(
         children: [
-          // SVG background jo status bar area me bhi extend hota hai
           Positioned(
             top: 0,
             left: 0,
@@ -112,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: false,
             child: Stack(
               children: [
-                // Purple header background (backup, SVG ke neeche)
                 Align(
                   alignment: Alignment.topCenter,
                   child: PurpleShape(
@@ -120,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: responsive.radius(42),
                   ),
                 ),
-                // Header content (profile + welcome text + icons)
+
                 Positioned(
                   top: responsive.height(20),
                   left: responsive.padding(24),
@@ -130,7 +120,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          // Navigate to Profile screen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -184,37 +173,45 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                // Scrollable content area
                 Positioned(
                   top: responsive.height(100),
                   left: 0,
                   right: 0,
-                  bottom: responsive.height(1), // Space for bottom nav
+                  bottom: responsive.height(1),
                   child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     padding: EdgeInsets.symmetric(
                       horizontal: responsive.padding(24),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Monthly Salary Card
-                        _SummaryCard(
-                          responsive: responsive,
-                          salary: _salary,
-                          kycStatus: _kycStatus,
-                          isSalaryVisible: _isSalaryVisible,
-                          onToggleVisibility: () {
-                            setState(() {
-                              _isSalaryVisible = !_isSalaryVisible;
-                            });
-                          },
+                        FadeInSlide(
+                          duration: const Duration(milliseconds: 600),
+                          child: _SummaryCard(
+                            responsive: responsive,
+                            salary: _salary,
+                            kycStatus: _kycStatus,
+                            isSalaryVisible: _isSalaryVisible,
+                            onToggleVisibility: () {
+                              setState(() {
+                                _isSalaryVisible = !_isSalaryVisible;
+                              });
+                            },
+                          ),
                         ),
                         SizedBox(height: responsive.height(20)),
-                        // Promotional banner slider
-                        _PromoBannerSlider(responsive: responsive),
+                        FadeInSlide(
+                          duration: const Duration(milliseconds: 600),
+                          delay: const Duration(milliseconds: 200),
+                          child: _PromoBannerSlider(responsive: responsive),
+                        ),
                         SizedBox(height: responsive.height(24)),
-                        // My Essentials Section
-                        _EssentialsSection(responsive: responsive),
+                        FadeInSlide(
+                          duration: const Duration(milliseconds: 600),
+                          delay: const Duration(milliseconds: 400),
+                          child: _EssentialsSection(responsive: responsive),
+                        ),
                         SizedBox(height: responsive.height(20)),
                       ],
                     ),
@@ -229,7 +226,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// SVG header design jo status bar area me extend hota hai
 const String _headerSvg = '''
 <svg width="375" height="210" viewBox="0 0 375 210" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M0 0H375V178C375 195.673 360.673 210 343 210H32C14.3269 210 0 195.673 0 178V0Z" fill="#482983"/>
@@ -377,14 +373,12 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(cardRadius),
         child: Stack(
           children: [
-            // White background
             Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.all(Radius.circular(cardRadius)),
               ),
             ),
-            // Gradient top border (diamond gradient)
             Positioned(
               top: 0,
               left: 0,
@@ -405,7 +399,6 @@ class _SummaryCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Salary component
             Positioned(
               top: responsive.height(18),
               left: responsive.width(18),
@@ -416,25 +409,21 @@ class _SummaryCard extends StatelessWidget {
                 onToggleVisibility: onToggleVisibility,
               ),
             ),
-            // Wallet icon
             Positioned(
               top: responsive.height(23.85),
               right: responsive.width(18),
               child: _WalletIcon(responsive: responsive),
             ),
-            // Timeline component
             Positioned(
               top: responsive.height(90),
               left: responsive.width(18),
               child: _TimelineComponent(responsive: responsive),
             ),
-            // Withdraw button
             Positioned(
               top: responsive.height(135),
               left: responsive.width(18),
               child: _WithdrawButton(responsive: responsive),
             ),
-            // Decorative circles - bottom right
             Positioned(
               bottom: 0,
               right: 0,
@@ -588,7 +577,6 @@ class _VisibilityIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = responsive.width(20);
-    // Use the eye-off icon when salary is hidden, eye icon when visible
     return SvgPicture.string(
       isVisible ? _visibilityOnIconSvg : _visibilityIconSvg,
       width: size,
@@ -597,7 +585,6 @@ class _VisibilityIcon extends StatelessWidget {
   }
 }
 
-// Eye-off icon (when salary is hidden)
 const String _visibilityIconSvg = '''
 <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M24.7566 5.46264C24.9163 5.2912 25.0033 5.06443 24.9991 4.83013C24.995 4.59583 24.9001 4.37228 24.7344 4.20658C24.5687 4.04087 24.3451 3.94596 24.1108 3.94182C23.8765 3.93769 23.6498 4.02466 23.4783 4.18441L4.18434 23.4784C4.09548 23.5612 4.02421 23.661 3.97478 23.772C3.92535 23.8829 3.89877 24.0027 3.89663 24.1241C3.89448 24.2456 3.91682 24.3662 3.96231 24.4788C4.00779 24.5914 4.0755 24.6937 4.16138 24.7796C4.24726 24.8655 4.34956 24.9332 4.46217 24.9787C4.57479 25.0241 4.69541 25.0465 4.81684 25.0443C4.93828 25.0422 5.05804 25.0156 5.16898 24.9662C5.27992 24.9168 5.37977 24.8455 5.46256 24.7566L8.89569 21.3235C10.5441 22.1001 12.441 22.6102 14.4704 22.6102C17.707 22.6102 20.6083 21.3114 22.6945 19.71C23.74 18.9081 24.6034 18.0134 25.2136 17.1343C25.8069 16.2793 26.2277 15.3424 26.2277 14.4705C26.2277 13.5987 25.8057 12.6617 25.2136 11.8067C24.6034 10.9277 23.74 10.0341 22.6957 9.231C22.379 8.98741 22.0445 8.75307 21.6924 8.52797L24.7566 5.46264ZM20.3792 9.84117L18.2436 11.9768C18.8194 12.8464 19.0769 13.8883 18.9725 14.9259C18.8681 15.9636 18.4082 16.9333 17.6707 17.6708C16.9333 18.4083 15.9636 18.8681 14.9259 18.9725C13.8882 19.077 12.8463 18.8195 11.9767 18.2437L10.268 19.9512C11.6011 20.5022 13.028 20.7909 14.4704 20.8014C17.2283 20.8014 19.7522 19.6883 21.5935 18.2751C22.5124 17.5696 23.2384 16.8063 23.7279 16.1033C24.2332 15.3749 24.4189 14.8046 24.4189 14.4705C24.4189 14.1365 24.2332 13.5661 23.7279 12.8378C23.2384 12.1347 22.5124 11.3714 21.5935 10.666C21.2157 10.3758 20.8117 10.1008 20.3792 9.84117ZM13.2995 16.9197C13.8058 17.1615 14.3747 17.2404 14.9277 17.1455C15.4806 17.0506 15.9906 16.7866 16.3874 16.3899C16.7841 15.9931 17.0481 15.4831 17.143 14.9301C17.2379 14.3771 17.159 13.8083 16.9172 13.302L13.2995 16.9197Z" fill="#482983"/>
@@ -606,7 +593,6 @@ const String _visibilityIconSvg = '''
 </svg>
 ''';
 
-// Eye-on icon (when salary is visible)
 const String _visibilityOnIconSvg = '''
 <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M14.5 6C8.5 6 3.73 9.61 1 14.5C3.73 19.39 8.5 23 14.5 23C20.5 23 25.27 19.39 28 14.5C25.27 9.61 20.5 6 14.5 6ZM14.5 20C11.74 20 9.5 17.76 9.5 15C9.5 12.24 11.74 10 14.5 10C17.26 10 19.5 12.24 19.5 15C19.5 17.76 17.26 20 14.5 20ZM14.5 12C12.84 12 11.5 13.34 11.5 15C11.5 16.66 12.84 18 14.5 18C16.16 18 17.5 16.66 17.5 15C17.5 13.34 16.16 12 14.5 12Z" fill="#482983"/>
@@ -654,6 +640,29 @@ class _TimelineComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final currentDay = now.day;
+    final currentMonth = now.month;
+    final currentYear = now.year;
+
+    final daysInMonth = DateTime(currentYear, currentMonth + 1, 0).day;
+
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final monthName = monthNames[currentMonth - 1];
+
     final barWidth = responsive.width(7);
     final barWidthSmall = responsive.width(6);
     final barHeight = responsive.height(11);
@@ -661,72 +670,48 @@ class _TimelineComponent extends StatelessWidget {
     final barGap = responsive.width(4);
     final barRadius = responsive.radius(22);
 
+    final numberOfBars = ((daysInMonth - 1) / 2).ceil() + 1;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Bars row - keeping bars in their original positions
         Stack(
           clipBehavior: Clip.none,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // First bar (1 Sep) - tall, purple
-                Container(
-                  width: barWidth,
-                  height: barHeightTall,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF5F2E97),
-                    borderRadius: BorderRadius.circular(barRadius),
+                for (int barIndex = 0; barIndex < numberOfBars; barIndex++) ...[
+                  Builder(
+                    builder: (context) {
+                      final startDay = (barIndex * 2) + 1;
+
+                      final isPassed = startDay <= currentDay;
+
+                      final isLastBar = barIndex == numberOfBars - 1;
+
+                      return Container(
+                        width: isLastBar ? barWidth : barWidthSmall,
+                        height: isLastBar ? barHeightTall : barHeight,
+                        decoration: BoxDecoration(
+                          color: isPassed
+                              ? const Color(0xFF5F2E97)
+                              : const Color(0xFFD9D9D9),
+                          borderRadius: BorderRadius.circular(barRadius),
+                        ),
+                      );
+                    },
                   ),
-                ),
-                SizedBox(width: barGap),
-                // Next 6 bars (2-7 Sep) - short, purple
-                ...List.generate(6, (index) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: barGap),
-                    child: Container(
-                      width: barWidthSmall,
-                      height: barHeight,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5F2E97),
-                        borderRadius: BorderRadius.circular(barRadius),
-                      ),
-                    ),
-                  );
-                }),
-                // Next 7 bars (8-14 Sep) - short, gray
-                ...List.generate(7, (index) {
-                  return Padding(
-                    padding: EdgeInsets.only(right: barGap),
-                    child: Container(
-                      width: barWidthSmall,
-                      height: barHeight,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD9D9D9),
-                        borderRadius: BorderRadius.circular(barRadius),
-                      ),
-                    ),
-                  );
-                }),
-                // Last bar - tall, gray (position unchanged)
-                Container(
-                  width: barWidth,
-                  height: barHeightTall,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(barRadius),
-                  ),
-                ),
+                  if (barIndex < numberOfBars - 1) SizedBox(width: barGap),
+                ],
               ],
             ),
-            // Dates positioned below bars without affecting bar positions
             Positioned(
               top: barHeightTall + responsive.height(4),
               left: 0,
               child: Text(
-                '1 Sep',
+                '1 $monthName',
                 style: TextStyle(
                   fontSize: responsive.fontSize(12),
                   fontWeight: FontWeight.w400,
@@ -740,7 +725,7 @@ class _TimelineComponent extends StatelessWidget {
               top: barHeightTall + responsive.height(4),
               right: 0,
               child: Text(
-                '30 Sep',
+                '$daysInMonth $monthName',
                 style: TextStyle(
                   fontSize: responsive.fontSize(12),
                   fontWeight: FontWeight.w400,
@@ -766,7 +751,6 @@ class _WithdrawButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Withdraw screen par navigate karo
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const WithdrawScreen()),
@@ -844,13 +828,11 @@ class _DecorativeCircles extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Bigger circle (behind)
         SvgPicture.string(
           _decorativeCircleBigSvg,
           width: responsive.width(98),
           height: responsive.height(66),
         ),
-        // Smaller circle (in front)
         Positioned(
           bottom: 0,
           right: 0,
@@ -906,9 +888,7 @@ class _ApplyOfferButton extends StatelessWidget {
         left: responsive.width(9),
       ),
       decoration: BoxDecoration(
-        color: const Color(
-          0xFFFFB703,
-        ), // hsba(43, 99%, 100%, 1) - bright yellow-orange
+        color: const Color(0xFFFFB703),
         borderRadius: BorderRadius.circular(responsive.radius(4)),
       ),
       child: Center(
@@ -1013,19 +993,12 @@ class _PromoBanner extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          stops: [
-            0.5963,
-            1.0,
-          ], // 59.63% to 100% (163.51% in CSS means end of container)
-          colors: [
-            Color(0xFFFFC400), // #FFC400 at 59.63%
-            Color(0xFFFF5500), // #FF5500 at end
-          ],
+          stops: [0.5963, 1.0],
+          colors: [Color(0xFFFFC400), Color(0xFFFF5500)],
         ),
       ),
       child: Stack(
         children: [
-          // Text content
           Positioned(
             top: responsive.height(9.7),
             left: responsive.width(16),
@@ -1039,9 +1012,7 @@ class _PromoBanner extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                     height: 1.0, // 100% line height
                     letterSpacing: 0,
-                    color: const Color(
-                      0xFF4A148C,
-                    ), // Purple (hsba(267, 86%, 55%, 1))
+                    color: const Color(0xFF4A148C),
                   ),
                   children: [
                     const TextSpan(text: 'Navratri Personal\n'),
@@ -1053,9 +1024,7 @@ class _PromoBanner extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         height: 1.0,
                         letterSpacing: 0,
-                        color: const Color(
-                          0xFFCE3A3A,
-                        ), // Reddish-orange for "20% OFF"
+                        color: const Color(0xFFCE3A3A),
                       ),
                     ),
                   ],
@@ -1063,13 +1032,11 @@ class _PromoBanner extends StatelessWidget {
               ),
             ),
           ),
-          // Apply offer button
           Positioned(
             top: responsive.height(86),
             left: responsive.width(16),
             child: _ApplyOfferButton(responsive: responsive),
           ),
-          // Goddess image
           Positioned(
             top: responsive.height(28.95),
             left: responsive.width(199.35),
@@ -1117,7 +1084,6 @@ class _GoddessImage extends StatelessWidget {
   }
 }
 
-/// My Essentials section jo services ka grid dikhata hai.
 class _EssentialsSection extends StatelessWidget {
   const _EssentialsSection({required this.responsive});
 
@@ -1128,7 +1094,6 @@ class _EssentialsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section header with "View all" link
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -1154,7 +1119,6 @@ class _EssentialsSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: responsive.height(16)),
-        // Grid of essential services
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -1186,7 +1150,6 @@ class _EssentialsSection extends StatelessWidget {
   }
 }
 
-/// Individual essential service card.
 class _EssentialCard extends StatelessWidget {
   const _EssentialCard({
     required this.responsive,
@@ -1299,3 +1262,78 @@ const String _cibilScoreSvg = '''
 </defs>
 </svg>
 ''';
+
+class FadeInSlide extends StatefulWidget {
+  const FadeInSlide({
+    super.key,
+    required this.child,
+    this.duration = const Duration(milliseconds: 800),
+    this.delay = Duration.zero,
+    this.offset = const Offset(0, 30),
+    this.curve = Curves.easeOutCubic,
+  });
+
+  final Widget child;
+  final Duration duration;
+  final Duration delay;
+  final Offset offset;
+  final Curve curve;
+
+  @override
+  State<FadeInSlide> createState() => _FadeInSlideState();
+}
+
+class _FadeInSlideState extends State<FadeInSlide>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+
+    _slideAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+
+    if (widget.delay == Duration.zero) {
+      _controller.forward();
+    } else {
+      Future.delayed(widget.delay, () {
+        if (mounted) {
+          _controller.forward();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _opacityAnimation.value,
+          child: Transform.translate(
+            offset: Offset(0, widget.offset.dy * _slideAnimation.value),
+            child: widget.child,
+          ),
+        );
+      },
+    );
+  }
+}
