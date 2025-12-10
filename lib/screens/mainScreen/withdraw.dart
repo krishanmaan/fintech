@@ -43,6 +43,14 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
           _maxAmount = response.data.availableAmountLimit;
           _availableLimit = response.data.availableAmountLimit;
 
+          // CRITICAL: Ensure max is always >= min to prevent slider assertion error
+          if (_maxAmount < _minAmount) {
+            debugPrint(
+              '⚠️ Warning: maxAmount ($_maxAmount) < minAmount ($_minAmount)',
+            );
+            _maxAmount = _minAmount; // Set them equal to prevent error
+          }
+
           // Ensure withdrawal amount is within valid range
           if (_withdrawalAmount > _maxAmount) {
             _withdrawalAmount = _maxAmount;
@@ -368,9 +376,9 @@ class _WithdrawalAmountCard extends StatelessWidget {
                   trackHeight: 4,
                 ),
                 child: Slider(
-                  value: amount,
+                  value: amount.clamp(minAmount, maxAmount),
                   min: minAmount,
-                  max: maxAmount,
+                  max: maxAmount > minAmount ? maxAmount : minAmount,
                   onChanged: onAmountChanged,
                 ),
               ),

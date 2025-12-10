@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double _salary = 0.0;
   String _kycStatus = 'NOT_STARTED';
   bool _isLoading = true;
+  bool _isSalaryVisible = false; // Salary visibility state
 
   @override
   void initState() {
@@ -201,6 +202,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           responsive: responsive,
                           salary: _salary,
                           kycStatus: _kycStatus,
+                          isSalaryVisible: _isSalaryVisible,
+                          onToggleVisibility: () {
+                            setState(() {
+                              _isSalaryVisible = !_isSalaryVisible;
+                            });
+                          },
                         ),
                         SizedBox(height: responsive.height(20)),
                         // Promotional banner slider
@@ -336,11 +343,15 @@ class _SummaryCard extends StatelessWidget {
     required this.responsive,
     required this.salary,
     required this.kycStatus,
+    required this.isSalaryVisible,
+    required this.onToggleVisibility,
   });
 
   final Responsive responsive;
   final double salary;
   final String kycStatus;
+  final bool isSalaryVisible;
+  final VoidCallback onToggleVisibility;
 
   @override
   Widget build(BuildContext context) {
@@ -398,7 +409,12 @@ class _SummaryCard extends StatelessWidget {
             Positioned(
               top: responsive.height(18),
               left: responsive.width(18),
-              child: _SalaryComponent(responsive: responsive, salary: salary),
+              child: _SalaryComponent(
+                responsive: responsive,
+                salary: salary,
+                isSalaryVisible: isSalaryVisible,
+                onToggleVisibility: onToggleVisibility,
+              ),
             ),
             // Wallet icon
             Positioned(
@@ -432,10 +448,17 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _SalaryComponent extends StatelessWidget {
-  const _SalaryComponent({required this.responsive, required this.salary});
+  const _SalaryComponent({
+    required this.responsive,
+    required this.salary,
+    required this.isSalaryVisible,
+    required this.onToggleVisibility,
+  });
 
   final Responsive responsive;
   final double salary;
+  final bool isSalaryVisible;
+  final VoidCallback onToggleVisibility;
 
   @override
   Widget build(BuildContext context) {
@@ -467,7 +490,9 @@ class _SalaryComponent extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    '₹ ${salary.toStringAsFixed(2)}',
+                    isSalaryVisible
+                        ? '₹ ${salary.toStringAsFixed(2)}'
+                        : '₹ ••••••',
                     style: TextStyle(
                       fontSize: responsive.fontSize(24),
                       fontWeight: FontWeight.w700,
@@ -478,7 +503,13 @@ class _SalaryComponent extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: responsive.width(4)),
-                _VisibilityIcon(responsive: responsive),
+                GestureDetector(
+                  onTap: onToggleVisibility,
+                  child: _VisibilityIcon(
+                    responsive: responsive,
+                    isVisible: isSalaryVisible,
+                  ),
+                ),
               ],
             ),
           ),
@@ -549,22 +580,36 @@ class _PurpleShapePainter extends CustomPainter {
 }
 
 class _VisibilityIcon extends StatelessWidget {
-  const _VisibilityIcon({required this.responsive});
+  const _VisibilityIcon({required this.responsive, required this.isVisible});
 
   final Responsive responsive;
+  final bool isVisible;
 
   @override
   Widget build(BuildContext context) {
     final size = responsive.width(20);
-    return SvgPicture.string(_visibilityIconSvg, width: size, height: size);
+    // Use the eye-off icon when salary is hidden, eye icon when visible
+    return SvgPicture.string(
+      isVisible ? _visibilityOnIconSvg : _visibilityIconSvg,
+      width: size,
+      height: size,
+    );
   }
 }
 
+// Eye-off icon (when salary is hidden)
 const String _visibilityIconSvg = '''
 <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M24.7566 5.46264C24.9163 5.2912 25.0033 5.06443 24.9991 4.83013C24.995 4.59583 24.9001 4.37228 24.7344 4.20658C24.5687 4.04087 24.3451 3.94596 24.1108 3.94182C23.8765 3.93769 23.6498 4.02466 23.4783 4.18441L4.18434 23.4784C4.09548 23.5612 4.02421 23.661 3.97478 23.772C3.92535 23.8829 3.89877 24.0027 3.89663 24.1241C3.89448 24.2456 3.91682 24.3662 3.96231 24.4788C4.00779 24.5914 4.0755 24.6937 4.16138 24.7796C4.24726 24.8655 4.34956 24.9332 4.46217 24.9787C4.57479 25.0241 4.69541 25.0465 4.81684 25.0443C4.93828 25.0422 5.05804 25.0156 5.16898 24.9662C5.27992 24.9168 5.37977 24.8455 5.46256 24.7566L8.89569 21.3235C10.5441 22.1001 12.441 22.6102 14.4704 22.6102C17.707 22.6102 20.6083 21.3114 22.6945 19.71C23.74 18.9081 24.6034 18.0134 25.2136 17.1343C25.8069 16.2793 26.2277 15.3424 26.2277 14.4705C26.2277 13.5987 25.8057 12.6617 25.2136 11.8067C24.6034 10.9277 23.74 10.0341 22.6957 9.231C22.379 8.98741 22.0445 8.75307 21.6924 8.52797L24.7566 5.46264ZM20.3792 9.84117L18.2436 11.9768C18.8194 12.8464 19.0769 13.8883 18.9725 14.9259C18.8681 15.9636 18.4082 16.9333 17.6707 17.6708C16.9333 18.4083 15.9636 18.8681 14.9259 18.9725C13.8882 19.077 12.8463 18.8195 11.9767 18.2437L10.268 19.9512C11.6011 20.5022 13.028 20.7909 14.4704 20.8014C17.2283 20.8014 19.7522 19.6883 21.5935 18.2751C22.5124 17.5696 23.2384 16.8063 23.7279 16.1033C24.2332 15.3749 24.4189 14.8046 24.4189 14.4705C24.4189 14.1365 24.2332 13.5661 23.7279 12.8378C23.2384 12.1347 22.5124 11.3714 21.5935 10.666C21.2157 10.3758 20.8117 10.1008 20.3792 9.84117ZM13.2995 16.9197C13.8058 17.1615 14.3747 17.2404 14.9277 17.1455C15.4806 17.0506 15.9906 16.7866 16.3874 16.3899C16.7841 15.9931 17.0481 15.4831 17.143 14.9301C17.2379 14.3771 17.159 13.8083 16.9172 13.302L13.2995 16.9197Z" fill="#482983"/>
 <path d="M14.4707 6.33083C15.7151 6.33083 16.9113 6.52377 18.0292 6.85056C18.0781 6.86516 18.1224 6.8923 18.1576 6.92929C18.1929 6.96628 18.2178 7.01184 18.23 7.06143C18.2422 7.11103 18.2412 7.16296 18.2271 7.21206C18.213 7.26116 18.1864 7.30573 18.1498 7.34135L17.1561 8.3362C17.1195 8.37319 17.074 8.40007 17.0239 8.41423C16.9738 8.42839 16.9209 8.42934 16.8703 8.41699C16.0833 8.23553 15.2784 8.1425 14.4707 8.13964C11.7128 8.13964 9.18893 9.25266 7.34756 10.6659C6.42868 11.3714 5.70274 12.1347 5.21316 12.8377C4.7079 13.5661 4.52219 14.1365 4.52219 14.4705C4.52219 14.8045 4.7079 15.3749 5.21316 16.1032C5.64004 16.7182 6.2478 17.3778 7.0075 18.0049C7.14738 18.1195 7.16065 18.3305 7.03162 18.4595L6.17786 19.3145C6.12557 19.3675 6.05524 19.3989 5.98085 19.4025C5.90645 19.4061 5.83343 19.3816 5.7763 19.3338C4.99973 18.6938 4.31088 17.9542 3.72752 17.1343C3.13544 16.2793 2.71338 15.3423 2.71338 14.4705C2.71338 13.5986 3.13544 12.6617 3.72752 11.8067C4.33769 10.9276 5.2011 10.0341 6.24539 9.23095C8.33276 7.62955 11.2341 6.33083 14.4707 6.33083Z" fill="#482983"/>
 <path d="M14.4703 9.94846C14.6134 9.94846 14.7545 9.95489 14.8936 9.96775C15.1312 9.99066 15.2168 10.274 15.0492 10.4429L13.5864 11.9044C13.1971 12.0394 12.8435 12.2609 12.5521 12.5522C12.2607 12.8436 12.0392 13.1973 11.9042 13.5866L10.4427 15.0493C10.2739 15.2181 9.99052 15.1313 9.96761 14.8937C9.90868 14.2669 9.98129 13.6347 10.1808 13.0376C10.3803 12.4405 10.7023 11.8916 11.1261 11.426C11.55 10.9605 12.0664 10.5886 12.6422 10.3342C13.2181 10.0798 13.8408 9.94838 14.4703 9.94846Z" fill="#482983"/>
+</svg>
+''';
+
+// Eye-on icon (when salary is visible)
+const String _visibilityOnIconSvg = '''
+<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M14.5 6C8.5 6 3.73 9.61 1 14.5C3.73 19.39 8.5 23 14.5 23C20.5 23 25.27 19.39 28 14.5C25.27 9.61 20.5 6 14.5 6ZM14.5 20C11.74 20 9.5 17.76 9.5 15C9.5 12.24 11.74 10 14.5 10C17.26 10 19.5 12.24 19.5 15C19.5 17.76 17.26 20 14.5 20ZM14.5 12C12.84 12 11.5 13.34 11.5 15C11.5 16.66 12.84 18 14.5 18C16.16 18 17.5 16.66 17.5 15C17.5 13.34 16.16 12 14.5 12Z" fill="#482983"/>
 </svg>
 ''';
 
