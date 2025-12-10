@@ -4,7 +4,8 @@ import '../../utils/animations.dart';
 import 'package:flutter/services.dart';
 import '../../services/auth_api_service.dart';
 import '../../services/storage_service.dart';
-import 'employee_id_screen.dart';
+import 'verify_identity_screen.dart';
+import '../mainScreen/home.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
@@ -91,10 +92,28 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         ),
       );
 
-      Navigator.pushReplacement(
-        context,
-        SmoothPageRoute(page: const EmployeeIdScreen()),
-      );
+      // Check KYC status and navigate accordingly
+      final kycStatus = response.data.kycStatus.kycStatus;
+      debugPrint('📋 KYC Status: $kycStatus');
+
+      if (kycStatus == 'VERIFIED') {
+        // KYC already verified - go directly to home
+        await storageService.saveLoginState(isLoggedIn: true);
+        debugPrint('✅ User KYC verified - navigating to home screen');
+        Navigator.pushReplacement(
+          context,
+          SmoothPageRoute(page: const HomeScreen()),
+        );
+      } else {
+        // KYC not verified - go to identity verification
+        debugPrint(
+          '⚠️ User KYC not verified - navigating to verify identity screen',
+        );
+        Navigator.pushReplacement(
+          context,
+          SmoothPageRoute(page: const VerifyIdentityScreen()),
+        );
+      }
     } on ApiException catch (e) {
       setState(() {
         _errorMessage = e.message;

@@ -13,7 +13,7 @@ class TransactionHistoryScreen extends StatefulWidget {
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   String _selectedFilter = 'All';
-  String _selectedPeriod = 'This month';
+  final String _selectedPeriod = 'This month';
   int? _expandedTransactionIndex;
 
   // API related state
@@ -94,7 +94,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   String _formatTime(DateTime date) {
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
     final period = date.hour >= 12 ? 'PM' : 'AM';
-    return '${hour}:${date.minute.toString().padLeft(2, '0')} $period';
+    return '$hour:${date.minute.toString().padLeft(2, '0')} $period';
   }
 
   @override

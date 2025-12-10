@@ -263,7 +263,7 @@ class LoginButton extends StatelessWidget {
 import 'package:flutter/material.dart';
 import 'package:fintech/services/auth_api_service.dart';
 import 'package:fintech/services/storage_service.dart';
-import 'package:fintech/screens/accountScreen/employee_id_screen.dart';
+import 'package:fintech/screens/accountScreen/verify_identity_screen.dart';
 
 class VerifyOtpButton extends StatelessWidget {
   final String phoneNumber;
@@ -295,7 +295,7 @@ class VerifyOtpButton extends StatelessWidget {
           // Navigate to home
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const EmployeeIdScreen()),
+            MaterialPageRoute(builder: (context) => const VerifyIdentityScreen()),
           );
         } on ApiException catch (e) {
           if (!context.mounted) return;

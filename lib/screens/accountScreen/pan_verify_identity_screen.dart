@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../utils/animations.dart';
 import '../../services/kyc_api_service.dart';
@@ -97,9 +98,299 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
 
   Future<void> _openDatePicker() async {
     DateTime tempSelected = _selectedDate ?? DateTime(2000, 1, 1);
-    DateTime visibleMonth = DateTime(tempSelected.year, tempSelected.month, 1);
 
-    await showModalBottomSheet<void>(
+    // Step 1: Select Year
+    int selectedYear =
+        await _showYearPicker(tempSelected.year) ?? tempSelected.year;
+
+    // Step 2: Select Month
+    int selectedMonth =
+        await _showMonthPicker(selectedYear, tempSelected.month) ??
+        tempSelected.month;
+
+    // Step 3: Select Day
+    DateTime? selectedDate = await _showDayPicker(
+      selectedYear,
+      selectedMonth,
+      tempSelected.day,
+    );
+
+    if (selectedDate != null) {
+      setState(() {
+        _selectedDate = selectedDate;
+      });
+    }
+  }
+
+  Future<int?> _showYearPicker(int currentYear) async {
+    int selectedYear = currentYear;
+
+    return await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Select Year',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF101828),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F6FA),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setModalState(() {
+                              selectedYear--;
+                            });
+                          },
+                          icon: const Icon(Icons.remove_circle_outline),
+                          color: const Color(0xFF5B2B8F),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: const Color(0xFF5B2B8F),
+                              width: 2,
+                            ),
+                          ),
+                          child: Text(
+                            '$selectedYear',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF5B2B8F),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setModalState(() {
+                              selectedYear++;
+                            });
+                          },
+                          icon: const Icon(Icons.add_circle_outline),
+                          color: const Color(0xFF5B2B8F),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            foregroundColor: const Color(0xFF101828),
+                            side: const BorderSide(color: Color(0xFFE4E7EC)),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(selectedYear);
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: const Color(0xFF532C8C),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Next'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<int?> _showMonthPicker(int year, int currentMonth) async {
+    int selectedMonth = currentMonth;
+
+    return await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Select Month for $year',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF101828),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 2.5,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                    itemCount: 12,
+                    itemBuilder: (context, index) {
+                      final monthNames = [
+                        'Jan',
+                        'Feb',
+                        'Mar',
+                        'Apr',
+                        'May',
+                        'Jun',
+                        'Jul',
+                        'Aug',
+                        'Sep',
+                        'Oct',
+                        'Nov',
+                        'Dec',
+                      ];
+                      final isSelected = selectedMonth == index + 1;
+                      return GestureDetector(
+                        onTap: () {
+                          setModalState(() {
+                            selectedMonth = index + 1;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFF5B2B8F)
+                                : const Color(0xFFF5F6FA),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFF5B2B8F)
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            monthNames[index],
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected
+                                  ? Colors.white
+                                  : const Color(0xFF101828),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            foregroundColor: const Color(0xFF101828),
+                            side: const BorderSide(color: Color(0xFFE4E7EC)),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(selectedMonth);
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: const Color(0xFF532C8C),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Next'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<DateTime?> _showDayPicker(int year, int month, int currentDay) async {
+    DateTime tempSelected = DateTime(year, month, currentDay);
+    DateTime visibleMonth = DateTime(year, month, 1);
+
+    return await showModalBottomSheet<DateTime>(
       context: context,
       backgroundColor: Colors.white,
       isScrollControlled: true,
@@ -109,200 +400,6 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            void changeMonth(int delta) {
-              setModalState(() {
-                visibleMonth = DateTime(
-                  visibleMonth.year,
-                  visibleMonth.month + delta,
-                  1,
-                );
-              });
-            }
-
-            Future<void> showYearMonthPicker() async {
-              int selectedYear = visibleMonth.year;
-              int selectedMonth = visibleMonth.month;
-
-              await showDialog(
-                context: context,
-                builder: (dialogContext) => StatefulBuilder(
-                  builder: (dialogContext, setDialogState) => AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    title: const Text(
-                      'Select Year & Month',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    content: SizedBox(
-                      width: double.maxFinite,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Year Selector
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5F6FA),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Year:',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        setDialogState(() {
-                                          selectedYear--;
-                                        });
-                                      },
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                      ),
-                                      color: const Color(0xFF5B2B8F),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        '$selectedYear',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        setDialogState(() {
-                                          selectedYear++;
-                                        });
-                                      },
-                                      icon: const Icon(
-                                        Icons.add_circle_outline,
-                                      ),
-                                      color: const Color(0xFF5B2B8F),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          // Month Grid
-                          const Text(
-                            'Select Month:',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  childAspectRatio: 2.5,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                ),
-                            itemCount: 12,
-                            itemBuilder: (context, index) {
-                              final monthNames = [
-                                'Jan',
-                                'Feb',
-                                'Mar',
-                                'Apr',
-                                'May',
-                                'Jun',
-                                'Jul',
-                                'Aug',
-                                'Sep',
-                                'Oct',
-                                'Nov',
-                                'Dec',
-                              ];
-                              final isSelected = selectedMonth == index + 1;
-                              return GestureDetector(
-                                onTap: () {
-                                  setDialogState(() {
-                                    selectedMonth = index + 1;
-                                  });
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? const Color(0xFF5B2B8F)
-                                        : const Color(0xFFF5F6FA),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    monthNames[index],
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: isSelected
-                                          ? Colors.white
-                                          : const Color(0xFF101828),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setModalState(() {
-                            visibleMonth = DateTime(
-                              selectedYear,
-                              selectedMonth,
-                              1,
-                            );
-                          });
-                          Navigator.pop(dialogContext);
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: const Color(0xFF5B2B8F),
-                        ),
-                        child: const Text('Apply'),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }
-
             List<Widget> buildCalendarDays() {
               final List<Widget> rows = [];
               const List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -417,60 +514,18 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _DateNavButton(
-                        icon: Icons.arrow_back_ios_new_rounded,
-                        onTap: () => changeMonth(-1),
-                      ),
-                      GestureDetector(
-                        onTap: showYearMonthPicker,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F6FA),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(
-                                0xFF5B2B8F,
-                              ).withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _formatMonthYear(visibleMonth),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF101828),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(
-                                Icons.arrow_drop_down,
-                                color: Color(0xFF5B2B8F),
-                                size: 20,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      _DateNavButton(
-                        icon: Icons.arrow_forward_ios_rounded,
-                        onTap: () => changeMonth(1),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ...buildCalendarDays(),
                   const SizedBox(height: 20),
+                  Text(
+                    'Select Day for ${_formatMonthYear(visibleMonth)}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF101828),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ...buildCalendarDays(),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
@@ -488,10 +543,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                       Expanded(
                         child: TextButton(
                           onPressed: () {
-                            setState(() {
-                              _selectedDate = tempSelected;
-                            });
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pop(tempSelected);
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -510,7 +562,6 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
         );
       },
     );
-    setState(() {});
   }
 
   String get _dateLabel {
@@ -721,6 +772,11 @@ class _PanInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      textCapitalization: TextCapitalization.characters,
+      inputFormatters: [
+        UpperCaseTextFormatter(),
+        LengthLimitingTextInputFormatter(10),
+      ],
       decoration: InputDecoration(
         filled: true,
         fillColor: const Color(0xFFF5F6FA),
@@ -1003,24 +1059,15 @@ class _PanWavePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _DateNavButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _DateNavButton({required this.icon, required this.onTap});
-
+class UpperCaseTextFormatter extends TextInputFormatter {
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFE4E7EC)),
-        ),
-        child: Icon(icon, size: 16, color: const Color(0xFF101828)),
-      ),
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }
