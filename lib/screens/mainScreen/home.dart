@@ -1,3 +1,4 @@
+import 'package:fintech/screens/mainScreen/explore_cards_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'components/bottom_nav.dart';
@@ -82,6 +83,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const WithdrawScreen()),
+            );
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ExploreCardsScreen()),
             );
           }
         },
