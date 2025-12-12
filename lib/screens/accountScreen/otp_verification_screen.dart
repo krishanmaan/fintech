@@ -96,8 +96,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       final kycStatus = response.data.kycStatus.kycStatus;
       debugPrint('📋 KYC Status: $kycStatus');
 
-      if (kycStatus == 'VERIFIED') {
-        // KYC already verified - go directly to home
+      if (kycStatus == 'COMPLETED') {
+        // KYC already completed - go directly to home
         await storageService.saveLoginState(isLoggedIn: true);
         debugPrint('✅ User KYC verified - navigating to home screen');
         Navigator.pushReplacement(

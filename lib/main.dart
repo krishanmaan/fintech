@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/accountScreen/login_screen.dart';
+import 'screens/accountScreen/verify_identity_screen.dart';
 import 'screens/mainScreen/home.dart';
 import 'services/storage_service.dart';
 import 'splash_screen.dart';
@@ -44,10 +45,36 @@ class MyApp extends StatelessWidget {
 class AuthChecker extends StatelessWidget {
   const AuthChecker({super.key});
 
+  Future<Widget> _determineInitialScreen() async {
+    final storageService = StorageService();
+    final isLoggedIn = await storageService.getLoginState();
+    
+    print('🔐 Login check: $isLoggedIn');
+
+    if (!isLoggedIn) {
+      print('❌ User not logged in - navigating to LoginScreen');
+      return const LoginScreen();
+    }
+
+    // User is logged in, check KYC status
+    final kycStatus = await storageService.getKycStatus();
+    final kycStatusValue = kycStatus?['kyc_status'] as String?;
+    
+    print('📋 KYC Status: $kycStatusValue');
+
+    if (kycStatusValue == 'COMPLETED') {
+      print('✅ KYC completed - navigating to HomeScreen');
+      return const HomeScreen();
+    } else {
+      print('⚠️ KYC not verified - navigating to VerifyIdentityScreen');
+      return const VerifyIdentityScreen();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: StorageService().getLoginState(),
+    return FutureBuilder<Widget>(
+      future: _determineInitialScreen(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -55,14 +82,13 @@ class AuthChecker extends StatelessWidget {
           );
         }
 
-        final isLoggedIn = snapshot.data ?? false;
-        print('🔐 Login check: $isLoggedIn');
+        final targetScreen = snapshot.data ?? const LoginScreen();
+        final splashDuration = targetScreen is LoginScreen ? 3 : 2;
 
-        if (isLoggedIn) {
-          return const SplashScreen(duration: 2, child: HomeScreen());
-        } else {
-          return const SplashScreen(duration: 3, child: LoginScreen());
-        }
+        return SplashScreen(
+          duration: splashDuration,
+          child: targetScreen,
+        );
       },
     );
   }
