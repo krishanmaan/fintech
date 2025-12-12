@@ -192,6 +192,7 @@ class _BankContentCard extends StatelessWidget {
         ],
       ),
       child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

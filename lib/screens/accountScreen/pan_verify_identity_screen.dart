@@ -124,20 +124,26 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
 
   Future<int?> _showYearPicker(int currentYear) async {
     int selectedYear = currentYear;
+    final int currentYearNow = DateTime.now().year;
+    final List<int> years = List.generate(
+      currentYearNow - 1940 + 1,
+      (index) => currentYearNow - index,
+    );
 
     return await showModalBottomSheet<int>(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Padding(
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
               padding: const EdgeInsets.all(20),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     width: 40,
@@ -156,63 +162,75 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                       color: Color(0xFF101828),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F6FA),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            setModalState(() {
-                              selectedYear--;
-                            });
-                          },
-                          icon: const Icon(Icons.remove_circle_outline),
-                          color: const Color(0xFF5B2B8F),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: const Color(0xFF5B2B8F),
-                              width: 2,
-                            ),
-                          ),
-                          child: Text(
-                            '$selectedYear',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF5B2B8F),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setModalState(() {
-                              selectedYear++;
-                            });
-                          },
-                          icon: const Icon(Icons.add_circle_outline),
-                          color: const Color(0xFF5B2B8F),
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose your birth year',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 24),
+                  Expanded(
+                    child: GridView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            childAspectRatio: 1.8,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                      itemCount: years.length,
+                      itemBuilder: (context, index) {
+                        final year = years[index];
+                        final isSelected = selectedYear == year;
+                        return GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              selectedYear = year;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFF5B2B8F)
+                                  : const Color(0xFFF5F6FA),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFF5B2B8F)
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFF5B2B8F,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              '$year',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w600,
+                                color: isSelected
+                                    ? Colors.white
+                                    : const Color(0xFF101828),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
@@ -222,22 +240,38 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             foregroundColor: const Color(0xFF101828),
                             side: const BorderSide(color: Color(0xFFE4E7EC)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text('Cancel'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(selectedYear);
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: const Color(0xFF532C8C),
-                            foregroundColor: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5B2B8F), Color(0xFF7F56D9)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text('Next'),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(selectedYear);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -285,6 +319,11 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                       color: Color(0xFF101828),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Pick the month you were born',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
                   const SizedBox(height: 24),
                   GridView.builder(
                     shrinkWrap: true,
@@ -324,13 +363,24 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                             color: isSelected
                                 ? const Color(0xFF5B2B8F)
                                 : const Color(0xFFF5F6FA),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected
                                   ? const Color(0xFF5B2B8F)
                                   : Colors.transparent,
                               width: 2,
                             ),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF5B2B8F,
+                                      ).withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
@@ -357,22 +407,38 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             foregroundColor: const Color(0xFF101828),
                             side: const BorderSide(color: Color(0xFFE4E7EC)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text('Cancel'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(selectedMonth);
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: const Color(0xFF532C8C),
-                            foregroundColor: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5B2B8F), Color(0xFF7F56D9)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text('Next'),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(selectedMonth);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Next',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -471,6 +537,17 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                         color: isSelected
                             ? const Color(0xFF5B2B8F)
                             : Colors.transparent,
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF5B2B8F,
+                                  ).withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
                       ),
                       alignment: Alignment.center,
                       child: Text(
@@ -480,7 +557,7 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                               ? Colors.white
                               : const Color(0xFF1D1E25),
                           fontWeight: isSelected
-                              ? FontWeight.w600
+                              ? FontWeight.w700
                               : FontWeight.w500,
                         ),
                       ),
@@ -523,6 +600,11 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                       color: Color(0xFF101828),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose the day you were born',
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
                   const SizedBox(height: 24),
                   ...buildCalendarDays(),
                   const SizedBox(height: 24),
@@ -535,22 +617,38 @@ class _PanVerifyIdentityScreenState extends State<PanVerifyIdentityScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             foregroundColor: const Color(0xFF101828),
                             side: const BorderSide(color: Color(0xFFE4E7EC)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text('Cancel'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(tempSelected);
-                          },
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: const Color(0xFF532C8C),
-                            foregroundColor: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5B2B8F), Color(0xFF7F56D9)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text('Apply'),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(tempSelected);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Apply',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -794,37 +892,87 @@ class _PanInputField extends StatelessWidget {
   }
 }
 
-class _DateInputField extends StatelessWidget {
+class _DateInputField extends StatefulWidget {
   final String label;
   final VoidCallback onTap;
 
   const _DateInputField({required this.label, required this.onTap});
 
   @override
+  State<_DateInputField> createState() => _DateInputFieldState();
+}
+
+class _DateInputFieldState extends State<_DateInputField> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
+    final bool hasDate = widget.label != 'Select date of birth';
+
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F6FA),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: label == 'Select date of birth'
-                      ? const Color(0xFF98A2B3)
-                      : const Color(0xFF101828),
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _isPressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: hasDate
+                  ? const Color(0xFF5B2B8F)
+                  : const Color(0xFFE4E7EC),
+              width: hasDate ? 2 : 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF101828).withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F6FA),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.calendar_today_rounded,
+                  color: Color(0xFF5B2B8F),
+                  size: 20,
                 ),
               ),
-            ),
-            const Icon(Icons.calendar_today_rounded, color: Color(0xFF5B2B8F)),
-          ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: hasDate ? FontWeight.w600 : FontWeight.w400,
+                    color: hasDate
+                        ? const Color(0xFF101828)
+                        : const Color(0xFF98A2B3),
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: hasDate
+                    ? const Color(0xFF5B2B8F)
+                    : const Color(0xFF98A2B3),
+              ),
+            ],
+          ),
         ),
       ),
     );

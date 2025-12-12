@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../utils/animations.dart';
 import 'aadhaar_verify_identity_screen.dart';
 
-
 class VerifyIdentityScreen extends StatefulWidget {
   const VerifyIdentityScreen({super.key});
 
@@ -24,9 +23,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                Expanded(
-                  child: _ContentCard(),
-                ),
+                Expanded(child: _ContentCard()),
               ],
             ),
           ),
@@ -73,7 +70,6 @@ class _ContentCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-
           const _HeaderLogo(),
           const SizedBox(height: 40),
 
@@ -232,20 +228,13 @@ class _KycDescription extends StatelessWidget {
       children: const [
         Text(
           'We Need To Verify Your Identity Before You Can',
-          style: TextStyle(
-            fontSize: 14,
-            color: Color(0xFF7D8CA1),
-            height: 1.5,
-          ),
+          style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1), height: 1.5),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 4),
         Text(
           'Before Continue',
-          style: TextStyle(
-            fontSize: 14,
-            color: Color(0xFF7D8CA1),
-          ),
+          style: TextStyle(fontSize: 14, color: Color(0xFF7D8CA1)),
           textAlign: TextAlign.center,
         ),
       ],
@@ -273,8 +262,42 @@ class _VerifyNowButton extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const AadhaarVerifyIdentityScreen(),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const AadhaarVerifyIdentityScreen(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOutCubic;
+
+                      var tween = Tween(
+                        begin: begin,
+                        end: end,
+                      ).chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+
+                      var fadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+                          .animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: const Interval(
+                                0.0,
+                                0.6,
+                                curve: Curves.easeIn,
+                              ),
+                            ),
+                          );
+
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: FadeTransition(
+                          opacity: fadeAnimation,
+                          child: child,
+                        ),
+                      );
+                    },
+                transitionDuration: const Duration(milliseconds: 400),
               ),
             );
           },
