@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../utils/animations.dart';
 import '../../services/storage_service.dart';
-import 'faqs_screen.dart';
+
 import 'transaction_history_screen.dart';
+import 'static_content_screen.dart';
 
 /// Profile screen with user details and menu options
 class ProfileScreen extends StatefulWidget {
@@ -345,6 +346,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'color': const Color(0xFF482983),
       },
       {
+        'icon': Icons.description_outlined,
+        'title': 'Terms & Conditions',
+        'color': const Color(0xFF482983),
+      },
+      {
+        'icon': Icons.privacy_tip_outlined,
+        'title': 'Privacy Policy',
+        'color': const Color(0xFF482983),
+      },
+      {
         'icon': Icons.logout,
         'title': 'Log out',
         'color': const Color(0xFFEF4444),
@@ -427,14 +438,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Navigate to refer and earn screen
         break;
       case 'FAQs':
-        // Navigate to FAQs screen with animation
-        Navigator.push(context, SmoothPageRoute(page: const FaqsScreen()));
+        Navigator.push(
+          context,
+          SmoothPageRoute(
+            page: const StaticContentScreen(pageType: 'FAQ', title: 'FAQs'),
+          ),
+        );
         break;
       case 'Contact Us':
-        // Navigate to contact us screen
+        Navigator.push(
+          context,
+          SmoothPageRoute(
+            page: const StaticContentScreen(
+              pageType: 'CONTACT',
+              title: 'Contact Us',
+            ),
+          ),
+        );
         break;
       case 'About us':
-        // Navigate to about us screen
+        Navigator.push(
+          context,
+          SmoothPageRoute(
+            page: const StaticContentScreen(
+              pageType: 'ABOUT',
+              title: 'About Us',
+            ),
+          ),
+        );
+        break;
+      case 'Terms & Conditions':
+        Navigator.push(
+          context,
+          SmoothPageRoute(
+            page: const StaticContentScreen(
+              pageType: 'TERMS',
+              title: 'Terms & Conditions',
+            ),
+          ),
+        );
+        break;
+      case 'Privacy Policy':
+        Navigator.push(
+          context,
+          SmoothPageRoute(
+            page: const StaticContentScreen(
+              pageType: 'PRIVACY',
+              title: 'Privacy Policy',
+            ),
+          ),
+        );
         break;
       case 'Log out':
         _showLogoutDialog();
