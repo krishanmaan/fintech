@@ -5,7 +5,10 @@ import 'components/bottom_nav.dart';
 import '../../utils/responsive.dart';
 import '../../services/storage_service.dart';
 import 'withdraw.dart';
+
 import 'profile_screen.dart';
+import 'static_content_screen.dart';
+import '../../utils/animations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -88,7 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 2) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ExploreCardsScreen()),
+              MaterialPageRoute(
+                builder: (context) => const ExploreCardsScreen(),
+              ),
             );
           }
         },
@@ -141,8 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               height: responsive.width(50),
                               child: CircleAvatar(
                                 radius: responsive.width(50) / 2,
-                                backgroundImage: const NetworkImage(
-                                  'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200',
+                                backgroundImage: const AssetImage(
+                                  'assets/profile.jpg',
                                 ),
                               ),
                             ),
@@ -174,7 +179,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const Spacer(),
-                      _ActionIcon(child: _HelpIcon(responsive: responsive)),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            SmoothPageRoute(
+                              page: const StaticContentScreen(
+                                pageType: 'FAQ',
+                                title: 'FAQs',
+                              ),
+                            ),
+                          );
+                        },
+                        child: _ActionIcon(
+                          child: _HelpIcon(responsive: responsive),
+                        ),
+                      ),
                       SizedBox(width: responsive.width(12)),
                       _NotificationIcon(responsive: responsive),
                     ],

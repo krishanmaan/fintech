@@ -199,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: ClipOval(
                   child: Image.asset(
-                    'assets/profile_avatar.png',
+                    'assets/profile.jpg',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -269,19 +269,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           const SizedBox(height: 16),
 
-          // KYC button
+          // KYC Status Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             decoration: BoxDecoration(
-              color: _kycStatus == 'VERIFIED'
-                  ? const Color(0xFF10B981)
-                  : const Color(0xFF482983),
+              color: _getKycStatusColor(),
               borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (_kycStatus == 'VERIFIED')
+                if (_kycStatus.toUpperCase() == 'VERIFIED')
                   const Padding(
                     padding: EdgeInsets.only(right: 6),
                     child: Icon(
@@ -291,7 +289,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 Text(
-                  _kycStatus == 'VERIFIED' ? 'KYC Verified' : 'KYC Pending',
+                  _getKycStatusText(),
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -315,21 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'title': 'Personal Details',
         'color': const Color(0xFF482983),
       },
-      {
-        'icon': Icons.language,
-        'title': 'Change App Language',
-        'color': const Color(0xFF482983),
-      },
-      {
-        'icon': Icons.security,
-        'title': 'App Permissions',
-        'color': const Color(0xFF482983),
-      },
-      {
-        'icon': Icons.card_giftcard,
-        'title': 'Refer and Earn',
-        'color': const Color(0xFF482983),
-      },
+
       {
         'icon': Icons.help_outline,
         'title': 'FAQs',
@@ -619,6 +603,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  String _getKycStatusText() {
+    final status = _kycStatus.toUpperCase();
+    if (status == 'VERIFIED') return 'KYC Verified';
+    if (status == 'REJECTED') return 'KYC Rejected';
+    if (status == 'SUBMITTED') return 'KYC Submitted';
+    return 'KYC Pending';
+  }
+
+  Color _getKycStatusColor() {
+    final status = _kycStatus.toUpperCase();
+    if (status == 'VERIFIED') return const Color(0xFF10B981); // Green
+    if (status == 'REJECTED') return const Color(0xFFEF4444); // Red
+    if (status == 'SUBMITTED') return const Color(0xFFF59E0B); // Amber/Orange
+    return const Color(0xFF482983); // Default Purple
   }
 }
 
