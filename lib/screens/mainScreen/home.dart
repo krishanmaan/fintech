@@ -9,6 +9,7 @@ import 'withdraw.dart';
 import 'profile_screen.dart';
 import 'static_content_screen.dart';
 import '../../utils/animations.dart';
+import '../../services/banner_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,11 +25,23 @@ class _HomeScreenState extends State<HomeScreen> {
   String _kycStatus = 'NOT_STARTED';
   bool _isLoading = true;
   bool _isSalaryVisible = false;
+  List<BannerModel> _banners = [];
+  final BannerService _bannerService = BannerService();
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadBanners();
+  }
+
+  Future<void> _loadBanners() async {
+    final banners = await _bannerService.fetchBanners();
+    if (mounted) {
+      setState(() {
+        _banners = banners;
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -231,7 +244,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         FadeInSlide(
                           duration: const Duration(milliseconds: 600),
                           delay: const Duration(milliseconds: 200),
-                          child: _PromoBannerSlider(responsive: responsive),
+                          child: _PromoBannerSlider(
+                            responsive: responsive,
+                            banners: _banners,
+                          ),
                         ),
                         SizedBox(height: responsive.height(24)),
                         FadeInSlide(
@@ -933,9 +949,10 @@ class _ApplyOfferButton extends StatelessWidget {
 }
 
 class _PromoBannerSlider extends StatefulWidget {
-  const _PromoBannerSlider({required this.responsive});
+  const _PromoBannerSlider({required this.responsive, required this.banners});
 
   final Responsive responsive;
+  final List<BannerModel> banners;
 
   @override
   State<_PromoBannerSlider> createState() => _PromoBannerSliderState();
@@ -944,7 +961,6 @@ class _PromoBannerSlider extends StatefulWidget {
 class _PromoBannerSliderState extends State<_PromoBannerSlider> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  static const int _totalSlides = 4;
 
   @override
   void dispose() {
@@ -969,42 +985,50 @@ class _PromoBannerSliderState extends State<_PromoBannerSlider> {
                 _currentPage = index;
               });
             },
-            itemCount: _totalSlides,
+            itemCount: widget.banners.isEmpty ? 1 : widget.banners.length,
             itemBuilder: (context, index) {
-              return _PromoBanner(responsive: responsive, slideIndex: index);
+              if (widget.banners.isEmpty) {
+                // Show default or placeholder if no banners
+                return _PromoBanner(responsive: responsive, banner: null);
+              }
+              return _PromoBanner(
+                responsive: responsive,
+                banner: widget.banners[index],
+              );
             },
           ),
         ),
         SizedBox(height: responsive.height(8)),
         // Pagination dots
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: List.generate(
-            _totalSlides,
-            (index) => Container(
-              margin: EdgeInsets.symmetric(horizontal: responsive.width(4)),
-              width: responsive.width(8),
-              height: responsive.width(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _currentPage == index
-                    ? const Color(0xFF482983) // Active dot color
-                    : const Color(0xFFD9D9D9), // Inactive dot color
+        if (widget.banners.isNotEmpty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              widget.banners.length,
+              (index) => Container(
+                margin: EdgeInsets.symmetric(horizontal: responsive.width(4)),
+                width: responsive.width(8),
+                height: responsive.width(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentPage == index
+                      ? const Color(0xFF482983) // Active dot color
+                      : const Color(0xFFD9D9D9), // Inactive dot color
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
 }
 
 class _PromoBanner extends StatelessWidget {
-  const _PromoBanner({required this.responsive, this.slideIndex = 0});
+  const _PromoBanner({required this.responsive, this.banner});
 
   final Responsive responsive;
-  final int slideIndex;
+  final BannerModel? banner;
 
   @override
   Widget build(BuildContext context) {
@@ -1015,6 +1039,47 @@ class _PromoBanner extends StatelessWidget {
       width: bannerWidth,
       height: bannerHeight,
       margin: EdgeInsets.symmetric(horizontal: responsive.width(4)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(responsive.radius(16)),
+        gradient: const LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          stops: [0.5963, 1.0],
+          colors: [Color(0xFFFFC400), Color(0xFFFF5500)],
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(responsive.radius(16)),
+        child: banner != null && banner!.imageUrl.isNotEmpty
+            ? GestureDetector(
+                onTap: () {
+                  if (banner!.redirectUrl.isNotEmpty) {
+                    debugPrint('Redirect to: ${banner!.redirectUrl}');
+                  }
+                },
+                child: Image.network(
+                  banner!.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            : _buildDefaultBannerContent(responsive),
+      ),
+    );
+  }
+
+  Widget _buildDefaultBannerContent(Responsive responsive) {
+    return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(responsive.radius(16)),
         gradient: const LinearGradient(
@@ -1169,6 +1234,14 @@ class _EssentialsSection extends StatelessWidget {
               responsive: responsive,
               iconSvg: items[index]['icon'] as String,
               label: items[index]['label'] as String,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ExploreCardsScreen(),
+                  ),
+                );
+              },
             );
           },
         ),
@@ -1182,16 +1255,18 @@ class _EssentialCard extends StatelessWidget {
     required this.responsive,
     required this.iconSvg,
     required this.label,
+    this.onTap,
   });
 
   final Responsive responsive;
   final String iconSvg;
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
